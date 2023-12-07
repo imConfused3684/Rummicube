@@ -1,0 +1,14 @@
+header {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: var(--main-color);
+    font-size: 20px;
+  }
+  
+  .header-wrapper {
+    width: 1200px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+  }
