@@ -1,9 +1,9 @@
 import './App.css'
-//import FirstForm from './common/el/firstForm.tsx'
-import AuthorizationForm from './common/el/authorizationForm.tsx'
-//import RegistrationForm from './common/el/registrationForm.tsx'
-//import ConnectionForm from './common/el/connectionForm.tsx'
+//import FirstForm from './forms/firstForm/firstForm.tsx'
+//import AuthorizationForm from './forms/authorizationForm/authorizationForm.tsx'
+//import RegistrationForm from './forms/registrationForm/registrationForm.tsx'
+import ConnectionForm from './forms/connectionForm/connectionForm.tsx'
 
 export default function App() {
-  return (<AuthorizationForm />)
+  return (<ConnectionForm />)
 }

@@ -1,7 +1,7 @@
-import Header from './header'
-import RumButton from './rumButton'
-import Input from './inputAndTxt'
-import "../styles/authorizationForm.css"
+import Header from '../../common/el/header'
+import RumButton from '../../common/el/rumButton'
+import Input from '../../common/el/inputAndTxt'
+import "../authorizationForm/authorizationForm.css"
 
 export default function registrationForm() {
 
