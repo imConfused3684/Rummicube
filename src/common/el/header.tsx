@@ -1,4 +1,3 @@
-//import React from "react";
 import "../styles/header.css"
 
 interface HeaderProps{
@@ -6,8 +5,6 @@ interface HeaderProps{
   rating: number;
 }
 
-// let username = "User"
-// let rating = 1000
 export default function Header({username, rating}:HeaderProps) {
     return (
         <header>

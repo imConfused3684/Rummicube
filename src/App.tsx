@@ -1,9 +1,8 @@
-//import React from 'react'
 import './App.css'
-import FirstFrom from './common/el/FirstForm.tsx'
+import FirstForm from './common/el/FirstForm.tsx'
 
 function App() {
-  return ( <FirstFrom />)
+  return ( <FirstForm />)
 }
 
 export default App
