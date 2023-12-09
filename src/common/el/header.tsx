@@ -1,9 +1,11 @@
-import React from "react";
 import "../styles/header.css"
 
-let username = "User"
-let rating = 1000
-const Header = () => {
+interface HeaderProps{
+  username: string;
+  rating: number;
+}
+
+export default function Header({username, rating}:HeaderProps) {
     return (
         <header>
         <div className="header-wrapper">
@@ -13,5 +15,3 @@ const Header = () => {
       </header>
     );
 }
-
-export default Header;
