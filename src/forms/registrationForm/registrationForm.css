@@ -1,0 +1,5 @@
+.or-authorize {
+    color: var(--prompt);
+    line-height: 1.5;
+    text-decoration: underline;
+}

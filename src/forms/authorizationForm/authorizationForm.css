@@ -4,3 +4,9 @@
     align-items:center;
     justify-content: center;
   }
+
+.or-register {
+  color: var(--prompt);
+  text-decoration: underline;
+  line-height: 1.5;
+}

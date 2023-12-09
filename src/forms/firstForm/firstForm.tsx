@@ -3,6 +3,7 @@ import RumButton from "../../common/el/rumButton";
 import InfoButton from "../../common/el/infoButton";
 import { useState } from "react";
 import "./firstForm.css";
+import { NavLink } from "react-router-dom";
 
 export default function FirstForm() {
   const [count, setCount] = useState(0);
@@ -20,7 +21,9 @@ export default function FirstForm() {
 
         <RumButton text="Создать игру" func={func} />
 
-        <RumButton text="Подключиться к игре" func={func} />
+        <NavLink to="/connection">
+          <RumButton text="Подключиться к игре" func={func} />
+        </NavLink>
 
         <div className="bottom-panel">
           <InfoButton text="i" func={func} />

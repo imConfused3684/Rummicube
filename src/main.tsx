@@ -1,7 +1,10 @@
-import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
+import ReactDOM from "react-dom/client";
+import App from "./App.tsx";
+import "./index.css";
+import { BrowserRouter } from "react-router-dom";
 
-ReactDOM.createRoot(document.querySelector('.customRoot')!).render(
-    <App />,
-)
+ReactDOM.createRoot(document.querySelector(".customRoot")!).render(
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+);
