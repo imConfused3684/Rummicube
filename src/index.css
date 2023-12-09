@@ -1,4 +1,23 @@
 :root {
   --aux-color: #163769;
   --main-color: #22539c;
+  --prompt: #9eb3d2;
+  --white: #f7f9f9;
+  --black: #1d1d1d;
+  --title-color: #0b1c35;
+  
+  --border-radius: 15px;
+
+  font-family: Arial, Helvetica, sans-serif
+}
+
+body {
+  display: flex;
+   flex-direction: column;
+    align-items: center;
+}
+
+.customRoot {
+  width: 1200px; 
+  height: 720px;
 }

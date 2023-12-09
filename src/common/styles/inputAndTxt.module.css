@@ -3,30 +3,34 @@
     flex-direction: column;
 
     align-items: center;
-    justify-content: start;
+    justify-content: flex-start;
 
     margin-bottom: 20px;
 }
 
 .bigP{
-    color: white;
+    color: var(--white);
     font-size: 30px;
     margin: 0;
 }
 
 .lilP{
-    color: white;
+    color: var(--prompt);
     font-size: 15px;
-    margin: 4px;
-    opacity: 60%;
+    margin: 5px 0;
 }
 
 .input{
     width: 300px;
     height: 28px;
-
     border-radius: 20px;
-
     font-size: 25px;
-    padding-left: 12px;
+    padding: 5px 15px;
+
+    border: 2px solid var(--aux-color);
 }
+
+.input:focus {
+    outline: none;
+}
+

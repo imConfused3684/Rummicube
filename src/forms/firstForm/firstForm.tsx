@@ -1,32 +1,33 @@
-import Header from '../../common/el/header'
-import RumButton from '../../common/el/rumButton'
-import { useState } from 'react'
-import "./firstForm.css"
-
+import Header from "../../common/el/header";
+import RumButton from "../../common/el/rumButton";
+import InfoButton from "../../common/el/infoButton";
+import { useState } from "react";
+import "./firstForm.css";
 
 export default function FirstForm() {
-    const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
 
-    function func(){
-      setCount((count) => count + 1);
-    }
+  function func() {
+    setCount((count) => count + 1);
+  }
 
-    return (
+  return (
     <>
-    
-    <div className="card">
-      <Header 
-        username='USer'
-        rating={1000}
-      />
+      <div className="card">
+        <Header username="USer" rating={1000} />
 
-      <h1>Руммикуб</h1>
-      
-      <RumButton 
-        text = {`Penis size is ${count} inches`}
-        func = {func}
-      />
-    </div>
+        <h1>Руммикуб</h1>
+
+        <RumButton text="Создать игру" func={func} />
+
+        <RumButton text="Подключиться к игре" func={func} />
+
+        <div className="bottom-panel">
+          <InfoButton text="i" func={func} />
+
+          <InfoButton text="?" func={func} />
+        </div>
+      </div>
     </>
-    );
+  );
 }

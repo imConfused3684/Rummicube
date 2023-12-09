@@ -1,0 +1,19 @@
+.button {
+    height: 80px;
+    width: 80px;
+    background-color: var(--aux-color);
+    border-radius: var(--border-radius);
+    color: var(--white);
+    font-size: 40px;
+    transition: all .2s ease;
+    border: 2px solid var(--aux-color);
+    cursor: pointer;
+  }
+  
+  .button:hover {
+    border-color: var(--white);
+  }
+  
+  .button:active {
+    border-color: var(--black);
+  }
