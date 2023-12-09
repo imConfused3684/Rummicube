@@ -1,8 +1,5 @@
-#root {
-  /* max-width: 1280px; */
+/* #root {
   width: 100%;
-  /* margin: 0 auto; */
-  /* padding: 2rem; */
   text-align: center;
 }
 
@@ -41,3 +38,60 @@
 .read-the-docs {
   color: #888;
 }
+
+.card {
+  width: 100%;
+  height: 100%;
+
+  position: relative;
+  background-color: var(--bg-color);
+  width: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+}
+
+.card a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+.card  a:hover {
+  color: #535bf2;
+}
+
+.card .card {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+.card h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+.card button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+.card button:hover {
+  border-color: #646cff;
+}
+.card button:focus,
+.card button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+} */

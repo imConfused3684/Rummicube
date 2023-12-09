@@ -1,9 +1,13 @@
 :root {
-  --bg-color: #22539c;
-  --main-color: #163769;
+  
+  --aux-color: #163769;
+  --main-color: #22539c;
+  
+}
+
+  /* 
   --border-radius: 15px;
-
-
+  --bg-color: #22539c;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -19,7 +23,6 @@
 
 body {
   position: relative;
-  background-color: var(--bg-color);
   width: 100%;
   display: flex;
   flex-flow: column nowrap;
@@ -81,4 +84,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */
