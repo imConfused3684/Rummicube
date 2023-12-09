@@ -1,21 +1,9 @@
-import React from 'react'
-import Header from './common/el/header'
-import { useState } from 'react'
+//import React from 'react'
 import './App.css'
+import FirstFrom from './common/el/FirstForm.tsx'
 
 function App() {
-  const [count, setCount] = useState(0)
-  return (
-    <>
-    <Header />
-      <h1>Руммикуб</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          Penis size is {count} inches
-        </button>
-      </div>
-    </>
-  )
+  return ( <FirstFrom />)
 }
 
 export default App
