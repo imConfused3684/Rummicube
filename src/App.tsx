@@ -1,8 +1,9 @@
 import './App.css'
-import FirstForm from './common/el/FirstForm.tsx'
+//import FirstForm from './common/el/firstForm.tsx'
+import AuthorizationForm from './common/el/authorizationForm.tsx'
+//import RegistrationForm from './common/el/registrationForm.tsx'
+//import ConnectionForm from './common/el/connectionForm.tsx'
 
-function App() {
-  return ( <FirstForm />)
+export default function App() {
+  return (<AuthorizationForm />)
 }
-
-export default App

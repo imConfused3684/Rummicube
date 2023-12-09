@@ -1,7 +1,7 @@
 import Header from './header'
 import RumButton from './rumButton'
 import { useState } from 'react'
-import "../styles/FirstForm.css"
+import "../styles/firstForm.css"
 
 
 export default function FirstForm() {
