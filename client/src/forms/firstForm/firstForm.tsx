@@ -1,16 +1,12 @@
 import Header from "../../common/el/header";
 import RumButton from "../../common/el/rumButton";
 import InfoButton from "../../common/el/infoButton";
-import { useState } from "react";
 import "./firstForm.css";
 import { NavLink } from "react-router-dom";
 
 export default function FirstForm() {
-  const [count, setCount] = useState(0);
 
-  function func() {
-    setCount((count) => count + 1);
-  }
+  function func() {}
 
   return (
     <>
