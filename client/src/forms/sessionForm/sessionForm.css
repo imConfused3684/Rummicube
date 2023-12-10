@@ -4,20 +4,36 @@
 {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 15px;
     position: absolute;
 }
 
 .exitGameButtWrapper{
-    top:10px;
-    right:10px;
+    top:0;
+    right:0;
 }
 
 .sortButts{
-    right: 10px;
+    right: 0;
+    top: 50%;
+    transform: translate(0, -50%);
 }
 
 .move{
-    right: 10px;
-    bottom: 10px;
+    right: 0;
+    bottom: 0;
+}
+
+
+.card {
+    width: 100%;
+    height: 100%;
+}
+
+.playing-table {
+    position: relative;
+    /* background-color: rgba(255, 255, 255, .3); */
+    width: 90%;
+    height: 90%;
+    border-radius: var(--border-radius);
 }
