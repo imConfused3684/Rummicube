@@ -4,13 +4,10 @@ import AuthorizationForm from "./forms/authorizationForm/authorizationForm.tsx";
 import RegistrationForm from "./forms/registrationForm/registrationForm.tsx";
 import ConnectionForm from "./forms/connectionForm/connectionForm.tsx";
 import RoomCustomizationForm from "./forms/roomCustomizationForm/roomCustomizationForm.tsx";
+import SessionForm from "./forms/sessionForm/sessionForm.tsx"
 import { Route, Routes } from "react-router-dom";
 
 export default function App() {
-  // return (<AuthorizationForm />)
-  // return (<RegistrationForm />)
-  // return (<ConnectionForm />)
-  // return (<FirstForm />)
 
   return (
     <Routes>
@@ -19,6 +16,7 @@ export default function App() {
       <Route path="/main" element={<FirstForm />} />
       <Route path="/connection" element={<ConnectionForm />} />
       <Route path="/room-customization" element={<RoomCustomizationForm />} />
+      <Route path="/game" element={<SessionForm />} />
     </Routes>
   );
 }

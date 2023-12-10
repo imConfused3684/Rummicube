@@ -2,10 +2,9 @@ import Header from '../../common/el/header'
 import RumButton from '../../common/el/rumButton'
 import Input from '../../common/el/inputAndTxt'
 import "../authorizationForm/authorizationForm.css"
+import { NavLink } from "react-router-dom";
 
 export default function connectionForm() {
-
-    function func(){}
 
     return (
       <div className="card">
@@ -17,10 +16,10 @@ export default function connectionForm() {
         bigText='Введите код комнаты:'
         lilText=''
       />
-      <RumButton 
-        text = {"Подключиться"}
-        func = {func}
-      />
+      <NavLink to="/game">
+        <RumButton text={"Подключиться"} func={()=>{}} />
+      </NavLink>
+
       
     </div>
     );

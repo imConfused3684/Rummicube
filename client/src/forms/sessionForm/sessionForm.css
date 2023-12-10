@@ -1,0 +1,23 @@
+.sortButts,
+.move,
+.exitGameButtWrapper
+{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: absolute;
+}
+
+.exitGameButtWrapper{
+    top:10px;
+    right:10px;
+}
+
+.sortButts{
+    right: 10px;
+}
+
+.move{
+    right: 10px;
+    bottom: 10px;
+}
