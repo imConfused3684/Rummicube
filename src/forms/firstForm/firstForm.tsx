@@ -17,9 +17,11 @@ export default function FirstForm() {
       <div className="card">
         <Header username="USer" rating={1000} />
 
-        <h1>Руммикуб</h1>
+        <h1 id="rummyTitle">Руммикуб</h1>
 
-        <RumButton text="Создать игру" func={func} />
+        <NavLink to="/room-customization">
+          <RumButton text="Создать игру" func={func} />
+        </NavLink>
 
         <NavLink to="/connection">
           <RumButton text="Подключиться к игре" func={func} />
