@@ -1,0 +1,40 @@
+.inputSliderWrapper {
+    width: calc(100% - 400px);
+    display: flex;
+    /* flex-direction: column; */
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 50px;
+    gap: 50px;
+}
+
+.label,
+.span {
+    color: var(--white);
+    font-size: 32px;
+    text-align: center;
+}
+
+.label {
+    margin-right: 40px;
+    width: 35%;
+}
+
+
+.input {
+    width: 300px;
+    position: absolute;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+
+.sliderWithNums {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    /* gap:15px; */
+    position: relative;
+}
