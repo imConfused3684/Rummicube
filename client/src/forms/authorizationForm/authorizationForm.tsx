@@ -2,20 +2,34 @@ import RumButton from "../../common/el/rumButton";
 import Input from "../../common/el/inputAndTxt";
 import "./authorizationForm.css";
 import { NavLink } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate } from "react-router-dom";
+import { login } from "../../common/service/userService";
 
 export default function authorizationForm() {
-  function func() {}
+  const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  async function func() {
+    let response = await login(username,password);
+
+    if(response.wins != null){
+      navigate(`/main/?username=${username}&wins=${response.wins}`);
+    }
+    else{
+      alert("Неправильный логин или пароль");
+    }
+  }
 
   return (
     <div className="card">
-      <Input bigText="Введите логин:" lilText="" />
-      <Input bigText="Введите пароль:" lilText="" />
+      <Input bigText="Введите логин:" lilText="" onChange={setUsername}/>
+      <Input bigText="Введите пароль:" lilText="" onChange={setPassword}/>
 
 
 
-      <NavLink to="/main">
-        <RumButton text={"Войти"} func={func} />
-      </NavLink>
+      <RumButton text={"Войти"} func={func} />
 
       <NavLink to="/registration">
         <span className="or-register">или зарегистрироваться</span>

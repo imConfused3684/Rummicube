@@ -34,8 +34,8 @@ const getUserCount = async (req, res, next) => {
         let wins = null;
 
         const query = await firestore.collection('users')
-            .where('login', '==', data.name)
-            .where('password', '==', data.pass)
+            .where('login', '==', data.login)
+            .where('password', '==', data.password)
             .get();
 
         if(query.size > 0){
@@ -51,7 +51,7 @@ const getUserCount = async (req, res, next) => {
 
         res.status(200).json({  wins });
     } catch (error) {
-        console.error('Error getting user count:', error);
+        console.error('Error getting user:', error);
         res.status(500).send('Internal Server Error');
     }
 }
