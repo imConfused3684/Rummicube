@@ -28,7 +28,7 @@ const addUser = async (req, res, next) => {
     }
 }
 
-const getUserCount = async (req, res, next) => {
+const getUserWins = async (req, res, next) => {
     try {
         const data = req.body;
         let wins = null;
@@ -47,8 +47,6 @@ const getUserCount = async (req, res, next) => {
             wins = null;
         }
 
-        
-
         res.status(200).json({  wins });
     } catch (error) {
         console.error('Error getting user:', error);
@@ -56,7 +54,25 @@ const getUserCount = async (req, res, next) => {
     }
 }
 
+const getUserCount = async (req, res, next) => {
+    try {
+        const data = req.body;
+
+        const query = await firestore.collection('users')
+            .where('login', '==', data.login)
+            .get();
+
+        const count  = query.size;
+
+        res.status(200).json({  count });
+    } catch (error) {
+        console.error('Error getting user count:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
 module.exports = {
     addUser,
+    getUserWins,
     getUserCount
 };

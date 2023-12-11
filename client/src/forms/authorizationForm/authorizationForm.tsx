@@ -4,7 +4,7 @@ import "./authorizationForm.css";
 import { NavLink } from "react-router-dom";
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { login } from "../../common/service/userService";
+import { userWins } from "../../common/service/userService";
 
 export default function authorizationForm() {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ export default function authorizationForm() {
   const [password, setPassword] = useState('');
 
   async function func() {
-    let response = await login(username,password);
+    const response = await userWins(username,password);
 
     if(response.wins != null){
       navigate(`/main/?username=${username}&wins=${response.wins}`);
