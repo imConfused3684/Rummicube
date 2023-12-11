@@ -5,13 +5,16 @@ import "./firstForm.css";
 import { NavLink } from "react-router-dom";
 
 export default function FirstForm() {
+  const queryParameters = new URLSearchParams(window.location.search);
+  const uName = queryParameters.get("username");
+  const wins = queryParameters.get("wins");
 
   function func() {}
 
   return (
     <>
       <div className="card">
-        <Header username="USer" rating={1000} />
+        <Header username={uName!} rating={Number(wins!)} />
 
         <h1 id="rummyTitle">Руммикуб</h1>
 
