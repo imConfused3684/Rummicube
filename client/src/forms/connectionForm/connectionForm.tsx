@@ -15,6 +15,7 @@ export default function connectionForm() {
       <Input
         bigText='Введите код комнаты:'
         lilText=''
+        onChange={()=>{}}
       />
       <NavLink to="/game">
         <RumButton text={"Подключиться"} func={()=>{}} />

@@ -28,6 +28,35 @@ const addUser = async (req, res, next) => {
     }
 }
 
+const getUserCount = async (req, res, next) => {
+    try {
+        const data = req.body;
+        let wins = null;
+
+        const query = await firestore.collection('users')
+            .where('login', '==', data.login)
+            .where('password', '==', data.password)
+            .get();
+
+        if(query.size > 0){
+            const user = query.docs[0].data();
+            wins = user.wins;
+        }
+        else
+        {
+            wins = null;
+        }
+
+        
+
+        res.status(200).json({  wins });
+    } catch (error) {
+        console.error('Error getting user:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
 module.exports = {
-    addUser
+    addUser,
+    getUserCount
 };
