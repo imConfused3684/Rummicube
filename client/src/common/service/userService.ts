@@ -13,8 +13,23 @@ export async function register(uName: string, passW: string) {
     });
 }
 
-export async function login(uName: string, passW: string) {
-    const response = await fetch(`${server}/api/user/login`, {
+export async function userLogInCheckAndGetUserWins(uName: string, passW: string) {
+    const response = await fetch(`${server}/api/user/loginAndWins`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            login: `${uName}`,
+            password: `${passW}`
+        })
+    });
+
+    return response.json();
+}
+
+export async function userCount(uName: string, passW: string) {
+    const response = await fetch(`${server}/api/user/count`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
