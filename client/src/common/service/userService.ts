@@ -13,8 +13,8 @@ export async function register(uName: string, passW: string) {
     });
 }
 
-export async function userWins(uName: string, passW: string) {
-    const response = await fetch(`${server}/api/user/wins`, {
+export async function userLogInCheckAndGetUserWins(uName: string, passW: string) {
+    const response = await fetch(`${server}/api/user/loginAndWins`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

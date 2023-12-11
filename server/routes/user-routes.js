@@ -4,7 +4,7 @@ const {addUser, getUserWins, getUserCount} = require('../controllers/userControl
 const router = express.Router();
 
 router.post('/user/register', addUser);
-router.post('/user/wins', getUserWins);
+router.post('/user/loginAndWins', getUserWins);
 router.post('/user/count', getUserCount);
 
 module.exports = {
