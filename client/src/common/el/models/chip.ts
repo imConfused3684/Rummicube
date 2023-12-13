@@ -1,3 +1,4 @@
 export class Chip {
-    color: Colors;
+    // color: Colors;
+
 }
