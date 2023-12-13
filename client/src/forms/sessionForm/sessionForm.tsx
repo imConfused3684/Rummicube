@@ -1,8 +1,12 @@
 import RumButton from "../../common/el/rumButton";
 import InfoButton from "../../common/el/infoButton";
 import Timer from "../../common/el/timer";
+import BoardComponent from "../../common/el/boardComponent";
+import { Board } from "../../common/el/models/board";
+
 import "./sessionForm.css";
 import { NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 interface FlagProp {
   flag: boolean;
@@ -35,9 +39,25 @@ export default function SessionForm() {
   function func777() {}
   function func789() {}
 
+  const [board, setBoard] = useState(new Board())
+
+  useEffect(() => {
+    restart()
+  }, [])
+
+  function restart() {
+    const newBoard = new Board()
+    newBoard.initCells()
+    setBoard(newBoard)
+  }
+
   return (
     <div className="card">
       <div className="playing-table">
+        <BoardComponent
+        board={board}
+        setBoard={setBoard}
+        />
         <NavLink className="exitGameButtWrapper" to="/main">
           <RumButton text={"Выход"} func={() => {}} />
         </NavLink>
