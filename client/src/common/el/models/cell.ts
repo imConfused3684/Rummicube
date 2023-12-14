@@ -8,13 +8,15 @@ export class Cell {
     board: Board;
     availbale: boolean;
     id: number;
+    isDivider: boolean;
 
-    constructor(board: Board, x: number, y: number, chip: Chip | null) {
+    constructor(board: Board, x: number, y: number, chip: Chip | null, isDivider: boolean) {
         this.x = x;
         this.y = y;
         this.chip = chip;
         this.board = board;
         this.id = Math.random();
         this.availbale = false;
+        this.isDivider = isDivider;
     }
 }
