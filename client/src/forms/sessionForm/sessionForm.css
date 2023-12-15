@@ -36,4 +36,7 @@
     width: 90%;
     height: 90%;
     border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

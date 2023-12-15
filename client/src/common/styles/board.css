@@ -1,0 +1,39 @@
+.board {
+    width: calc(42px * 23);
+    height: calc(57px * 8);
+    /* padding: 10px; */
+    display: flex;
+    flex-wrap: wrap;
+    /* background-color: aqua; */
+}
+
+.cell  {
+    width: 40px;
+    height: 55px;
+    border: 1px solid var(--aux-color);
+    /* width: 60px;
+    height: 80px; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 5px;
+    transition: all .2s ease;
+}
+
+.cell:hover {
+    background-color: var(--cell-hover);
+}
+
+.cell-divider  {
+    width: 40px;
+    height: 55px;
+    border: 1px solid var(--main-color);
+    /* width: 60px;
+    height: 80px; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 5px;
+}
