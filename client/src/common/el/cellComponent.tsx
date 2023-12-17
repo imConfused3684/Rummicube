@@ -7,9 +7,9 @@ interface CellProps {
 
 export default function CellComponent({ cell }: CellProps) {
   if (cell.isDivider) {
-    return <div className="cell-divider">{cell.chip}</div>;
+    return <div className="cell-divider"></div>;
   }
   else {
-    return <div className="cell">{cell.chip}</div>;
+    return <div className="cell"></div>;
   }
 }

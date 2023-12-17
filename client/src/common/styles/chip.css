@@ -1,0 +1,38 @@
+.chip {
+    background-color: #dad3c8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 15px;
+    font-size: 18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    font-weight: 700;
+
+    transition: all .2s ease;
+}
+
+.chip img {
+    width: 25px;
+}
+
+.chip:hover {
+    transform: scale(2);
+}
+
+.black {
+    color: #1D1D1D;
+}
+
+.red {
+    color: #b22223;
+}
+
+.yellow {
+    color: #ee8437;
+}
+
+.blue {
+    color: #1440ea;
+}

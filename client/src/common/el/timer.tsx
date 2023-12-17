@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 
 interface TimerProp {
   time: number;
+  func: () => void;
+
 }
 
-export default function CountdownTimer({ time }: TimerProp) {
+export default function CountdownTimer({ time, func }: TimerProp) {
   const [countdown, setCountdown] = useState(time); // начальное значение
 
   useEffect(() => {
@@ -18,12 +20,11 @@ export default function CountdownTimer({ time }: TimerProp) {
     return () => clearInterval(timer); // очистка таймера при размонтировании компонента
   }, []); // пустой массив зависимостей для запуска эффекта только один раз
 
+  useEffect(() => {
+    if (countdown === 0) {
+      func(); // вызываем функцию, когда таймер достигает нуля
+    }
+  }, [countdown, func]);
+
   return <div className={styles.timer}>{countdown}</div>;
 }
-
-// export default function Timer({time}:TimerProp) {
-
-//     return (
-//         <div className={styles.timer}>{countdown}</div>
-//     );
-// }

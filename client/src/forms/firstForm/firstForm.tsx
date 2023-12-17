@@ -27,9 +27,9 @@ export default function FirstForm() {
         </NavLink>
 
         <div className="bottom-panel">
-          <InfoButton text="i" func={func} />
+          <InfoButton content="i" func={func} />
 
-          <InfoButton text="?" func={func} />
+          <InfoButton content="?" func={func} />
         </div>
       </div>
     </>
