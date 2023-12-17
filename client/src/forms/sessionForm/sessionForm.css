@@ -1,6 +1,7 @@
 .sortButts,
 .move,
-.exitGameButtWrapper
+.exitGameButtWrapper,
+.sackWrapper
 {
     display: flex;
     flex-direction: column;
@@ -19,7 +20,8 @@
     transform: translate(0, -50%);
 }
 
-.move{
+.move,
+.sackWrapper{
     right: 0;
     bottom: 0;
 }

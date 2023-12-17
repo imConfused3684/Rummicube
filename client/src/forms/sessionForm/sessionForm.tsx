@@ -1,75 +1,120 @@
 import RumButton from "../../common/el/rumButton";
 import InfoButton from "../../common/el/infoButton";
 import Timer from "../../common/el/timer";
-import BoardComponent from "../../common/el/boardComponent";
+
 import { Board } from "../../common/el/models/board";
+import { ChipSack } from "../../common/el/models/chipSack";
+import { Hand } from "../../common/el/models/hand";
 
 import "./sessionForm.css";
 import { NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+import HandComponent from "../../common/el/handComponent";
+import BoardComponent from "../../common/el/boardComponent";
+
 interface FlagProp {
   flag: boolean;
 }
 
-function MoveOrSack({ flag }: FlagProp) {
-  function funcS() {}
-
-  function funcNo() {}
-  function funcOk() {}
-
-  if (flag) {
-    return (
-      <div className="sackWrapper">
-        <InfoButton text="S" func={funcS} />
-      </div>
-    );
-  } else {
-    return (
-      <div className="move">
-        <InfoButton text="No" func={funcNo} />
-        <InfoButton text="Ok" func={funcOk} />
-      </div>
-    );
-  }
-}
-
-
 export default function SessionForm() {
+  function MoveOrSack({ flag }: FlagProp) {
+    function funcS() {
+      // initHand();
+      getRandomChip(chipSack, hand);
+      setHand({ ...hand }); // Обновите состояние руки
+    }
+
+    function funcNo() {}
+    function funcOk() {}
+
+    if (flag) {
+      return (
+        <div className="sackWrapper">
+          <InfoButton
+            content={<img src="./src/assets/sack.svg" />}
+            func={() => funcS()}
+          />
+        </div>
+      );
+    } else {
+      return (
+        <div className="move">
+          <InfoButton content="No" func={funcNo} />
+          <InfoButton content="Ok" func={funcOk} />
+        </div>
+      );
+    }
+  }
+
   function func777() {}
   function func789() {}
+  function timeIsUp() {}
 
-  const [board, setBoard] = useState(new Board())
+  const [board, setBoard] = useState(new Board());
+  const [chipSack, setChipSack] = useState(new ChipSack());
+  const [hand, setHand] = useState(new Hand());
 
   useEffect(() => {
-    restart()
-  }, [])
+    restart();
+  }, []);
 
   function restart() {
-    const newBoard = new Board()
-    newBoard.initCells()
-    setBoard(newBoard)
+    const newBoard = new Board();
+    newBoard.initCells();
+    setBoard(newBoard);
+
+    const newChipSack = new ChipSack();
+    setChipSack(newChipSack);
+
+    const newHand = new Hand();
+    // initHand();
+    for (let i = 0; i < 14; i++) {
+      getRandomChip(newChipSack, newHand);
+    }
+    setHand(newHand);
+    console.log("penis");
+  }
+
+  function getRandomChip(chipSack: ChipSack, hand: Hand) {
+    let randInd = Math.floor(Math.random() * chipSack.chips.size) + 1;
+    // console.log(randInd);
+    let i = 0;
+    for (let curChip of chipSack.chips) {
+      i++;
+      if (i >= randInd) {
+        hand.chipsInHand.add(curChip);
+        chipSack.chips.delete(curChip);
+        break;
+      }
+    }
+  }
+
+  function initHand() {
+    console.log("penis?")
+    for (let i = 0; i < 14; i++) {
+      getRandomChip(chipSack, hand);
+    }
   }
 
   return (
     <div className="card">
       <div className="playing-table">
-        <BoardComponent
-        board={board}
-        setBoard={setBoard}
-        />
+        <BoardComponent board={board} setBoard={setBoard} />
         <NavLink className="exitGameButtWrapper" to="/main">
           <RumButton text={"Выход"} func={() => {}} />
         </NavLink>
 
         <div className="sortButts">
-          <InfoButton text="789" func={func789} />
-          <InfoButton text="777" func={func777} />
+          <InfoButton content="789" func={func789} />
+          <InfoButton content="777" func={func777} />
         </div>
 
-        <MoveOrSack flag={false} />
+        <MoveOrSack flag={true} />
 
-        <Timer time={180} />
+        <Timer time={180} func={timeIsUp} />
+
+        <HandComponent hand={hand} />
       </div>
     </div>
   );
