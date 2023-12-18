@@ -28,14 +28,27 @@ export default function SessionForm() {
     if(selectedCell && selectedCell != cell && selectedCell.chip?.canMove(cell)){
       selectedCell.moveChip(cell);
       setSelectedCell(null);
-    }else{
+    }else if(selectedCell == cell){
+      setSelectedCell(null);
+    }
+    else{
       setSelectedCell(cell);
     }
   }
 
-  function handClick(cell: Cell){
-    setSelectedCell(cell);
+  function handClick(chip: Chip){
+    if(selectedCell && selectedCell.chip === null){
+      selectedCell.chip = chip;
+      hand.chipsInHand.delete(chip);
+
+      setSelectedCell(null);
+      setHand({ ...hand });
+    }
+    else{
+      console.log("aasdasds");
+    }
   }
+
 
   function MoveOrSack({ flag }: FlagProp) {
     function funcS() {
@@ -162,7 +175,7 @@ export default function SessionForm() {
 
         <Timer time={180} func={timeIsUp} />
 
-        <HandComponent hand={hand} click={handClick}/>
+        <HandComponent hand={hand} handClick={handClick}/>
       </div>
     </div>
   );

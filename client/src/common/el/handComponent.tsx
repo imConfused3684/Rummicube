@@ -6,13 +6,15 @@ import ChipComponent from "./chipComponent";
 import { Hand } from "./models/hand";
 
 import { Cell } from "./models/cell"
+import { Chip } from "./models/chip";
 
 interface handProps {
   hand: Hand;
-  click: (cell: Cell) => void;
+  handClick: (chip: Chip) => void;
 }
 
-export default function HandComponent({ hand, click }: handProps) {
+
+export default function HandComponent({ hand, handClick }: handProps) {
 //   let chipsInHand = new Set<Chip>();
 
 //   for (let i = 1; i <= 14; i++) {
@@ -29,11 +31,12 @@ export default function HandComponent({ hand, click }: handProps) {
 //     }
 //   }
 
+  
   return (
     <div className="hand">
       {[...hand.chipsInHand].map((chip, index) => (
         <React.Fragment key={index}>
-          <div key={chip.id}><ChipComponent chip={chip}  /></div>
+          <div key={chip.id} onClick={() => handClick(chip)}><ChipComponent chip={chip}  /></div>
         </React.Fragment>
       ))}
     </div>
