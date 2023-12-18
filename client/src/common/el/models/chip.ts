@@ -24,4 +24,12 @@ export class Chip {
         // При одинаковом color сравниваем по value
         return this.value - otherChip.value;
     }
+
+    canMove(target: Cell):boolean{
+        return !target?.chip;
+    }
+
+    moveChip(target: Cell){
+
+    }
 }

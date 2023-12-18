@@ -1,4 +1,5 @@
 import { Cell } from "./cell"
+import { Chip } from "./chip";
 
 export class Board {
     cells: Cell[][] = []
@@ -18,5 +19,14 @@ export class Board {
         }
 
     
+    }
+
+    public getCell(x: number, y: number){
+        return this.cells[x][y];
+    }
+
+    public addChipToCell(x: number, y: number, chip: Chip){
+        chip.cell = this.cells[x][y];
+        this.cells[x][y].chip = chip;
     }
 }

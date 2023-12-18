@@ -19,4 +19,12 @@ export class Cell {
         this.availbale = false;
         this.isDivider = isDivider;
     }
+
+    moveChip(target: Cell){
+        if(this.chip && this.chip.canMove(target)){
+            this.chip.moveChip(target);
+            target.chip = this.chip;
+            this,this.chip = null;
+        }
+    }
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import "../styles/hand.css";
 // import { ChipSack } from "./models/chipSack";
-import { Chip } from "./models/chip";
+//import { Chip } from "./models/chip";
 import ChipComponent from "./chipComponent";
 import { Hand } from "./models/hand";
 
