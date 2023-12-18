@@ -109,7 +109,7 @@ export default function SessionForm() {
       
     }
     function funcOk() {
-      alert(board.ckeckRow789(board.cells[0]));
+      alert(board.checkBoardValidity());
     }
 
     if (flag) {
