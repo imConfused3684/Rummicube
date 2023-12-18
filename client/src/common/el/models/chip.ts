@@ -13,4 +13,15 @@ export class Chip {
         this.value = value;
         this.cell = null;
     }
+
+    compare(otherChip: Chip): number {
+        // Сравнение по color
+        if (this.color > otherChip.color) {
+            return 1;
+        } else if (this.color < otherChip.color) {
+            return -1;
+        }
+        // При одинаковом color сравниваем по value
+        return this.value - otherChip.value;
+    }
 }

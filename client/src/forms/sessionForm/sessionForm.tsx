@@ -47,8 +47,16 @@ export default function SessionForm() {
     }
   }
 
-  function func777() {}
-  function func789() {}
+  function func777() {
+    const setArray = Array.from(hand.chipsInHand).sort((chip1, chip2) => chip1.compare(chip2));
+    hand.chipsInHand = new Set(setArray);
+    setHand({ ...hand });
+  }
+  function func789() {
+    const setArray = Array.from(hand.chipsInHand).sort((a, b) => a.value - b.value);
+    hand.chipsInHand = new Set(setArray);
+    setHand({ ...hand });
+  }
   function timeIsUp() {}
 
   const [board, setBoard] = useState(new Board());
@@ -73,7 +81,6 @@ export default function SessionForm() {
       getRandomChip(newChipSack, newHand);
     }
     setHand(newHand);
-    console.log("penis");
   }
 
   function getRandomChip(chipSack: ChipSack, hand: Hand) {
