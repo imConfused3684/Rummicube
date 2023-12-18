@@ -17,6 +17,7 @@ export class ChipSack {
 
         //Черные 
         this.chips.add(new Chip(chipId, Colors.BLACK, 0, null))
+        chipId++;
 
         for (let i = 0; i < 13; i++) {
             for (let j = 0; j < 2; j++) {

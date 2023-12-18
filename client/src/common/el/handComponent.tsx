@@ -1,15 +1,20 @@
 import React from "react";
 import "../styles/hand.css";
 // import { ChipSack } from "./models/chipSack";
-import { Chip } from "./models/chip";
+//import { Chip } from "./models/chip";
 import ChipComponent from "./chipComponent";
 import { Hand } from "./models/hand";
 
+import { Cell } from "./models/cell"
+import { Chip } from "./models/chip";
+
 interface handProps {
-  hand: Hand
+  hand: Hand;
+  handClick: (chip: Chip) => void;
 }
 
-export default function HandComponent({ hand }: handProps) {
+
+export default function HandComponent({ hand, handClick }: handProps) {
 //   let chipsInHand = new Set<Chip>();
 
 //   for (let i = 1; i <= 14; i++) {
@@ -26,11 +31,12 @@ export default function HandComponent({ hand }: handProps) {
 //     }
 //   }
 
+  
   return (
     <div className="hand">
       {[...hand.chipsInHand].map((chip, index) => (
         <React.Fragment key={index}>
-          <ChipComponent chip={chip} key={chip.id} />
+          <div key={chip.id} onClick={() => handClick(chip)}><ChipComponent chip={chip}  /></div>
         </React.Fragment>
       ))}
     </div>

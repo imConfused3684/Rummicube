@@ -37,3 +37,7 @@
     width: 42px;
     /* height: 57px; */
 }
+
+.selected{
+    background-color: var(--aux-color);
+}

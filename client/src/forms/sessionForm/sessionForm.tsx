@@ -5,6 +5,7 @@ import Timer from "../../common/el/timer";
 import { Board } from "../../common/el/models/board";
 import { ChipSack } from "../../common/el/models/chipSack";
 import { Hand } from "../../common/el/models/hand";
+import { Chip } from "../../common/el/models/chip";
 
 import "./sessionForm.css";
 import { NavLink } from "react-router-dom";
@@ -13,20 +14,103 @@ import { useEffect, useState } from "react";
 import HandComponent from "../../common/el/handComponent";
 import BoardComponent from "../../common/el/boardComponent";
 
+import { Colors } from "../../common/el/models/colors"
+import { Cell } from "../../common/el/models/cell"
+
 interface FlagProp {
   flag: boolean;
 }
 
+let backupBoard: Board;
+let backupHand: Hand;
+
 export default function SessionForm() {
+  const [moveFlag, setMoveFlag] = useState<boolean>(true);
+  const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
+
+  function click(cell: Cell){
+    if(moveFlag){
+      backupBoard = new Board();
+
+      for (let i = 0; i < 8; i++) {
+        const row: Cell[] = []
+        for (let j = 0; j < 23; j++) {
+            row.push(new Cell(backupBoard, j, i, board.cells[i][j].chip, j == 4 || j == 9))
+        }
+        backupBoard.cells.push(row);
+      }
+
+      backupHand = new Hand();
+      hand.chipsInHand.forEach(chip => {
+        backupHand.chipsInHand.add(chip);
+      });
+
+      setMoveFlag(false);
+    }
+    
+
+    if(selectedCell && selectedCell != cell && selectedCell.chip?.canMove(cell)){
+      selectedCell.moveChip(cell);
+      setSelectedCell(null);
+    }else if(selectedCell == cell){
+      setSelectedCell(null);
+    }
+    else{
+      setSelectedCell(cell);
+    }
+  }
+
+  function handClick(chip: Chip){
+    if(moveFlag){
+      backupBoard = new Board();
+
+      for (let i = 0; i < 8; i++) {
+        const row: Cell[] = []
+        for (let j = 0; j < 23; j++) {
+            row.push(new Cell(backupBoard, j, i, board.cells[i][j].chip, j == 4 || j == 9))
+        }
+        backupBoard.cells.push(row);
+      }
+
+      backupHand = new Hand();
+      hand.chipsInHand.forEach(chip => {
+        backupHand.chipsInHand.add(chip);
+      });
+
+      setMoveFlag(false);
+    }
+
+    if(selectedCell && selectedCell.chip === null){
+      selectedCell.chip = chip;
+      hand.chipsInHand.delete(chip);
+
+      setSelectedCell(null);
+      setHand({ ...hand });
+    }
+    else{
+      console.log("aasdasds");
+    }
+  }
+
+
   function MoveOrSack({ flag }: FlagProp) {
     function funcS() {
       // initHand();
-      getRandomChip(chipSack, hand);
+      getRandomChipToHand(chipSack, hand);
       setHand({ ...hand }); // Обновите состояние руки
     }
 
-    function funcNo() {}
-    function funcOk() {}
+    function funcNo() {
+      setMoveFlag(true);
+
+      setBoard(backupBoard);
+
+      setHand({ ...backupHand });
+      
+    }
+    function funcOk() {
+      alert(board.checkBoardValidity());
+    }
 
     if (flag) {
       return (
@@ -47,8 +131,16 @@ export default function SessionForm() {
     }
   }
 
-  function func777() {}
-  function func789() {}
+  function func777() {
+    const setArray = Array.from(hand.chipsInHand).sort((a, b) => a.value - b.value);
+    hand.chipsInHand = new Set(setArray);
+    setHand({ ...hand });
+  }
+  function func789() {
+    const setArray = Array.from(hand.chipsInHand).sort((chip1, chip2) => chip1.compare(chip2));
+    hand.chipsInHand = new Set(setArray);
+    setHand({ ...hand });
+  }
   function timeIsUp() {}
 
   const [board, setBoard] = useState(new Board());
@@ -60,23 +152,24 @@ export default function SessionForm() {
   }, []);
 
   function restart() {
+    const newChipSack = new ChipSack();
+    setChipSack(newChipSack);
+
+
     const newBoard = new Board();
     newBoard.initCells();
     setBoard(newBoard);
 
-    const newChipSack = new ChipSack();
-    setChipSack(newChipSack);
 
     const newHand = new Hand();
     // initHand();
     for (let i = 0; i < 14; i++) {
-      getRandomChip(newChipSack, newHand);
+      getRandomChipToHand(newChipSack, newHand);
     }
     setHand(newHand);
-    console.log("penis");
   }
 
-  function getRandomChip(chipSack: ChipSack, hand: Hand) {
+  function getRandomChipToHand(chipSack: ChipSack, hand: Hand) {
     let randInd = Math.floor(Math.random() * chipSack.chips.size) + 1;
     // console.log(randInd);
     let i = 0;
@@ -90,17 +183,30 @@ export default function SessionForm() {
     }
   }
 
-  function initHand() {
-    console.log("penis?")
-    for (let i = 0; i < 14; i++) {
-      getRandomChip(chipSack, hand);
+  function getRandomChip(chipSack: ChipSack): Chip {
+    let randInd = Math.floor(Math.random() * chipSack.chips.size) + 1;
+    // console.log(randInd);
+    let i = 0;
+    for (let curChip of chipSack.chips) {
+      i++;
+      if (i >= randInd) {
+        chipSack.chips.delete(curChip);
+        return curChip;
+      }
     }
+    return new Chip(-666, Colors.YELLOW, -666, null);
   }
+
+  // function initHand() {
+  //   for (let i = 0; i < 14; i++) {
+  //     getRandomChip(chipSack, hand);
+  //   }
+  // }
 
   return (
     <div className="card">
       <div className="playing-table">
-        <BoardComponent board={board} setBoard={setBoard} />
+        <BoardComponent board={board} setBoard={setBoard} click={click} selectedCell={selectedCell}/>
         <NavLink className="exitGameButtWrapper" to="/main">
           <RumButton text={"Выход"} func={() => {}} />
         </NavLink>
@@ -110,11 +216,11 @@ export default function SessionForm() {
           <InfoButton content="777" func={func777} />
         </div>
 
-        <MoveOrSack flag={true} />
+        <MoveOrSack flag={moveFlag} />
 
         <Timer time={180} func={timeIsUp} />
 
-        <HandComponent hand={hand} />
+        <HandComponent hand={hand} handClick={handClick}/>
       </div>
     </div>
   );
