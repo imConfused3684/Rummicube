@@ -42,25 +42,36 @@ export class Board {
         }
 
         row = this.cells[i].slice(10, 23);
-        if (!(this.ckeckRow789(row))) {
+        if (!(this.checkRow789(row))) {
             return false;
         }
     }
     return true;
 }
 
-    ckeckRow789(row: Cell[]): boolean {
-    let flag = true;
+checkRow789(row: Cell[]): boolean {
+    let flag: boolean = true;
 
-    let checked = 0;
-    let startFlag = false;
+    let checked: number = 0;
+    let startFlag: boolean = false;
+    let meTWO: boolean = false;
 
     let tempValue: number;
-    let tempColor: Colors;
+    let tempColor: Colors | null;
 
     row.forEach(cell => {
-        if (cell.chip && startFlag == false) {
-            console.log(1 + " / " + checked);
+        if(cell.chip && meTWO && cell.chip.value == 2){
+            flag = false;
+        }
+        else if (cell.chip && startFlag == false && cell.chip.value == 0) {
+
+            startFlag = true;
+
+            tempValue = cell.chip.value;
+            tempColor = null;
+            checked++;
+        }
+        else if (cell.chip && startFlag == false) {
 
             startFlag = true;
 
@@ -68,11 +79,9 @@ export class Board {
             tempColor = cell.chip.color;
             checked++;
         } else if (cell.chip === null && startFlag) {
-            console.log(2 + " / " + checked);
             startFlag = false;
 
             if (checked < 3) {
-                console.log("false indeed2");
                 flag = false;
             }
             else {
@@ -80,21 +89,31 @@ export class Board {
             }
         }
         else if (cell.chip && startFlag) {
-            console.log(3 + " / " + checked);
-            if (tempValue == 0 && cell.chip.value == 1) {
+            
+            if (tempValue == 13 && cell.chip.value == 0) {
                 flag = false;
             }
             else if (tempValue == 0 || cell.chip.value == 0 || (tempColor == cell.chip.color && tempValue + 1 == cell.chip.value)) {
-                if (cell.chip.value == 0) {
+                if(meTWO){
+                    meTWO = false;
+                }
+                if (tempValue == 0 && cell.chip.value == 0) {
+                    meTWO = true;
+                }
+
+                if (tempValue != 0 && cell.chip.value == 0) {
                     tempValue = tempValue + 1;
                 }
                 else {
                     tempValue = cell.chip.value;
                 }
+
+                if(tempColor == null && cell.chip.value != 0){
+                    tempColor = cell.chip.color;
+                }
                 checked++;
             }
             else {
-                console.log("false indeed3");
                 flag = false;
             }
         }
