@@ -15,12 +15,28 @@ import HandComponent from "../../common/el/handComponent";
 import BoardComponent from "../../common/el/boardComponent";
 
 import { Colors } from "../../common/el/models/colors"
+import { Cell } from "../../common/el/models/cell"
 
 interface FlagProp {
   flag: boolean;
 }
 
 export default function SessionForm() {
+  const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
+
+  function click(cell: Cell){
+    if(selectedCell && selectedCell != cell && selectedCell.chip?.canMove(cell)){
+      selectedCell.moveChip(cell);
+      setSelectedCell(null);
+    }else{
+      setSelectedCell(cell);
+    }
+  }
+
+  function handClick(cell: Cell){
+    setSelectedCell(cell);
+  }
+
   function MoveOrSack({ flag }: FlagProp) {
     function funcS() {
       // initHand();
@@ -51,7 +67,6 @@ export default function SessionForm() {
   }
 
   function func777() {
-    
     const setArray = Array.from(hand.chipsInHand).sort((a, b) => a.value - b.value);
     hand.chipsInHand = new Set(setArray);
     setHand({ ...hand });
@@ -133,7 +148,7 @@ export default function SessionForm() {
   return (
     <div className="card">
       <div className="playing-table">
-        <BoardComponent board={board} setBoard={setBoard} />
+        <BoardComponent board={board} setBoard={setBoard} click={click} selectedCell={selectedCell}/>
         <NavLink className="exitGameButtWrapper" to="/main">
           <RumButton text={"Выход"} func={() => {}} />
         </NavLink>
@@ -147,7 +162,7 @@ export default function SessionForm() {
 
         <Timer time={180} func={timeIsUp} />
 
-        <HandComponent hand={hand} />
+        <HandComponent hand={hand} click={handClick}/>
       </div>
     </div>
   );

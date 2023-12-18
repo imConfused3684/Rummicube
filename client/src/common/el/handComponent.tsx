@@ -5,11 +5,14 @@ import "../styles/hand.css";
 import ChipComponent from "./chipComponent";
 import { Hand } from "./models/hand";
 
+import { Cell } from "./models/cell"
+
 interface handProps {
-  hand: Hand
+  hand: Hand;
+  click: (cell: Cell) => void;
 }
 
-export default function HandComponent({ hand }: handProps) {
+export default function HandComponent({ hand, click }: handProps) {
 //   let chipsInHand = new Set<Chip>();
 
 //   for (let i = 1; i <= 14; i++) {
@@ -30,7 +33,7 @@ export default function HandComponent({ hand }: handProps) {
     <div className="hand">
       {[...hand.chipsInHand].map((chip, index) => (
         <React.Fragment key={index}>
-          <ChipComponent chip={chip} key={chip.id} />
+          <div key={chip.id}><ChipComponent chip={chip}  /></div>
         </React.Fragment>
       ))}
     </div>

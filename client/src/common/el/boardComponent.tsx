@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React/*, { useState }*/ from "react";
 import "../styles/board.css";
 import CellComponent from "./cellComponent";
 import UpperCell from "./upperCell";
@@ -9,19 +9,12 @@ import { Cell } from "./models/cell"
 interface boardProps {
   board: Board;
   setBoard: (board: Board) => void;
+  click: (cell: Cell) => void;
+  selectedCell: Cell | null;
 }
 
-export default function BoardComponent({ board, setBoard }: boardProps) {
-  const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
-
-  function click(cell: Cell){
-    if(selectedCell && selectedCell != cell && selectedCell.chip?.canMove(cell)){
-      selectedCell.moveChip(cell);
-      setSelectedCell(null);
-    }else{
-      setSelectedCell(cell);
-    }
-  }
+export default function BoardComponent({ board, setBoard, click, selectedCell }: boardProps) {
+  
 
   const upperCellsSmallSection = Array.from({ length: 4 }, (_, index) => (
     <UpperCell num={1} />
