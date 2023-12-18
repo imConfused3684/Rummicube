@@ -108,7 +108,9 @@ export default function SessionForm() {
       setHand({ ...backupHand });
       
     }
-    function funcOk() {}
+    function funcOk() {
+      alert(board.ckeckRow789(board.cells[0]));
+    }
 
     if (flag) {
       return (
