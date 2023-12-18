@@ -63,9 +63,16 @@ export class Board {
             }
             else if(cell.chip && startFlag){
                 console.log(3 + " / " + checked);
-                if(tempValue == 0 || cell.chip.value == 0 || (tempColor == cell.chip.color && tempValue + 1 == cell.chip.value)){
-                    tempValue = cell.chip.value;
-                    tempColor = cell.chip.color;
+                if(tempValue == 0 && cell.chip.value == 1){
+                    flag = false;
+                }
+                else if(tempValue == 0 || cell.chip.value == 0 || (tempColor == cell.chip.color && tempValue + 1 == cell.chip.value)){
+                    if(cell.chip.value == 0){
+                        tempValue = tempValue + 1;
+                    }
+                    else{
+                        tempValue = cell.chip.value;
+                    }
                     checked++;
                 }
                 else{
