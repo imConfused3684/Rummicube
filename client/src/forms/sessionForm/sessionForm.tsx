@@ -21,10 +21,34 @@ interface FlagProp {
   flag: boolean;
 }
 
+let backupBoard: Board;
+let backupHand: Hand;
+
 export default function SessionForm() {
+  const [moveFlag, setMoveFlag] = useState<boolean>(true);
   const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
 
   function click(cell: Cell){
+    if(moveFlag){
+      backupBoard = new Board();
+
+      for (let i = 0; i < 8; i++) {
+        const row: Cell[] = []
+        for (let j = 0; j < 23; j++) {
+            row.push(new Cell(backupBoard, j, i, board.cells[i][j].chip, j == 4 || j == 9))
+        }
+        backupBoard.cells.push(row);
+      }
+
+      backupHand = new Hand();
+      hand.chipsInHand.forEach(chip => {
+        backupHand.chipsInHand.add(chip);
+      });
+
+      setMoveFlag(false);
+    }
+    
+
     if(selectedCell && selectedCell != cell && selectedCell.chip?.canMove(cell)){
       selectedCell.moveChip(cell);
       setSelectedCell(null);
@@ -37,6 +61,25 @@ export default function SessionForm() {
   }
 
   function handClick(chip: Chip){
+    if(moveFlag){
+      backupBoard = new Board();
+
+      for (let i = 0; i < 8; i++) {
+        const row: Cell[] = []
+        for (let j = 0; j < 23; j++) {
+            row.push(new Cell(backupBoard, j, i, board.cells[i][j].chip, j == 4 || j == 9))
+        }
+        backupBoard.cells.push(row);
+      }
+
+      backupHand = new Hand();
+      hand.chipsInHand.forEach(chip => {
+        backupHand.chipsInHand.add(chip);
+      });
+
+      setMoveFlag(false);
+    }
+
     if(selectedCell && selectedCell.chip === null){
       selectedCell.chip = chip;
       hand.chipsInHand.delete(chip);
@@ -57,7 +100,14 @@ export default function SessionForm() {
       setHand({ ...hand }); // Обновите состояние руки
     }
 
-    function funcNo() {}
+    function funcNo() {
+      setMoveFlag(true);
+
+      setBoard(backupBoard);
+
+      setHand({ ...backupHand });
+      
+    }
     function funcOk() {}
 
     if (flag) {
@@ -106,13 +156,6 @@ export default function SessionForm() {
 
     const newBoard = new Board();
     newBoard.initCells();
-    newBoard.addChipToCell(1,1,getRandomChip(newChipSack));
-    newBoard.addChipToCell(1,2,getRandomChip(newChipSack));
-    newBoard.addChipToCell(1,3,getRandomChip(newChipSack));
-
-    newBoard.addChipToCell(2,10,getRandomChip(newChipSack));
-    newBoard.addChipToCell(7,11,getRandomChip(newChipSack));
-    newBoard.addChipToCell(7,12,getRandomChip(newChipSack));
     setBoard(newBoard);
 
 
@@ -171,7 +214,7 @@ export default function SessionForm() {
           <InfoButton content="777" func={func777} />
         </div>
 
-        <MoveOrSack flag={true} />
+        <MoveOrSack flag={moveFlag} />
 
         <Timer time={180} func={timeIsUp} />
 
