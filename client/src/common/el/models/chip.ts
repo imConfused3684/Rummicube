@@ -5,13 +5,14 @@ export class Chip {
     id: number;
     color: Colors;
     value: any;
-    cell: Cell | null;
+    // cell: Cell | null;
 
-    constructor( id: number, color: Colors, value: any, cell: Cell | null) {
+    // constructor( id: number, color: Colors, value: any, cell: Cell | null) {
+    constructor( id: number, color: Colors, value: any) {
         this.id = id;
         this.color = color;
         this.value = value;
-        this.cell = null;
+        // this.cell = null;
     }
 
     compare(otherChip: Chip): number {

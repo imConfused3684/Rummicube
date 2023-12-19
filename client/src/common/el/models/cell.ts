@@ -15,7 +15,8 @@ export class Cell {
 
             this.x = x;
             this.y = y;
-            this.chip = chip;
+            // this.chip = chip;
+            this.chip = null;
             // this.board = board;
             this.id = Math.random();
             this.availbale = false;

@@ -41,7 +41,7 @@ export default function SessionForm() {
         for (let j = 0; j < 23; j++) {
           row.push(
             new Cell(
-              backupBoard,
+              // backupBoard,
               j,
               i,
               board.cells[i][j].chip,
@@ -83,7 +83,7 @@ export default function SessionForm() {
         for (let j = 0; j < 23; j++) {
           row.push(
             new Cell(
-              backupBoard,
+              // backupBoard,
               j,
               i,
               board.cells[i][j].chip,

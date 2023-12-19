@@ -25,7 +25,7 @@ export class Board {
     }
 
     public addChipToCell(x: number, y: number, chip: Chip) {
-        chip.cell = this.cells[x][y];
+        // chip.cell = this.cells[x][y];
         this.cells[x][y].chip = chip;
     }
 
