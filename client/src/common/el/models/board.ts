@@ -28,7 +28,7 @@ export class Board {
         this.cells[x][y].chip = chip;
     }
 
-    public checkBoardValidity(): boolean {
+    public checkBoardValidity(setError: (s:string[]) => void): boolean {
         let errors: number[][] = [];
         let flag: boolean = true;
 
@@ -54,11 +54,15 @@ export class Board {
         }
 
         if (!flag) {
-            let s: string = "Найдены ошибки:\n";
+            let errorsList: string[] = [];
+            // let s: string = `Найдены ошибки:\n`;
+            errorsList.push(`Найдены ошибки:\n`);
+            // let s: string = "";
             errors.forEach(row => {
-                s += `Ошибка в строке ${row[0] + 1} в ${row[1] == 3 ? "секции 1-13" : `${row[1]}й секции 1111`}\n`;
+                let s = `Ошибка в строке ${row[0] + 1} в ${row[1] == 3 ? "секции 1-13" : `${row[1]}й секции 1111`}`;
+                errorsList.push(s);
             });
-            alert(s);
+            setError(errorsList);
         }
 
         return flag;

@@ -14,8 +14,9 @@ import { useEffect, useState } from "react";
 import HandComponent from "../../common/el/handComponent";
 import BoardComponent from "../../common/el/boardComponent";
 
-import { Colors } from "../../common/el/models/colors"
-import { Cell } from "../../common/el/models/cell"
+import { Colors } from "../../common/el/models/colors";
+import { Cell } from "../../common/el/models/cell";
+import Logger from "../../common/el/logger";
 
 interface FlagProp {
   flag: boolean;
@@ -27,71 +28,90 @@ let backupHand: Hand;
 export default function SessionForm() {
   const [moveFlag, setMoveFlag] = useState<boolean>(true);
   const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
+  const [errors, setErrors] = useState<string[]>([]);
 
-  function click(cell: Cell){
-    if(moveFlag){
+
+
+  function click(cell: Cell) {
+    if (moveFlag) {
       backupBoard = new Board();
 
       for (let i = 0; i < 8; i++) {
-        const row: Cell[] = []
+        const row: Cell[] = [];
         for (let j = 0; j < 23; j++) {
-            row.push(new Cell(backupBoard, j, i, board.cells[i][j].chip, j == 4 || j == 9))
+          row.push(
+            new Cell(
+              backupBoard,
+              j,
+              i,
+              board.cells[i][j].chip,
+              j == 4 || j == 9
+            )
+          );
         }
         backupBoard.cells.push(row);
       }
 
       backupHand = new Hand();
-      hand.chipsInHand.forEach(chip => {
+      hand.chipsInHand.forEach((chip) => {
         backupHand.chipsInHand.add(chip);
       });
 
       setMoveFlag(false);
     }
-    
 
-    if(selectedCell && selectedCell != cell && selectedCell.chip?.canMove(cell)){
+    if (
+      selectedCell &&
+      selectedCell != cell &&
+      selectedCell.chip?.canMove(cell)
+    ) {
       selectedCell.moveChip(cell);
       setSelectedCell(null);
-    }else if(selectedCell == cell){
+    } else if (selectedCell == cell) {
       setSelectedCell(null);
-    }
-    else{
+    } else {
       setSelectedCell(cell);
     }
   }
 
-  function handClick(chip: Chip){
-    if(moveFlag){
+  function handClick(chip: Chip) {
+    if (moveFlag) {
       backupBoard = new Board();
 
       for (let i = 0; i < 8; i++) {
-        const row: Cell[] = []
+        const row: Cell[] = [];
         for (let j = 0; j < 23; j++) {
-            row.push(new Cell(backupBoard, j, i, board.cells[i][j].chip, j == 4 || j == 9))
+          row.push(
+            new Cell(
+              backupBoard,
+              j,
+              i,
+              board.cells[i][j].chip,
+              j == 4 || j == 9
+            )
+          );
         }
         backupBoard.cells.push(row);
       }
 
       backupHand = new Hand();
-      hand.chipsInHand.forEach(chip => {
+      hand.chipsInHand.forEach((chip) => {
         backupHand.chipsInHand.add(chip);
       });
 
       setMoveFlag(false);
     }
 
-    if(selectedCell && selectedCell.chip === null){
+    if (selectedCell && selectedCell.chip === null) {
       selectedCell.chip = chip;
       hand.chipsInHand.delete(chip);
 
       setSelectedCell(null);
       setHand({ ...hand });
-    }
-    else{
+    } else {
       console.log("aasdasds");
     }
   }
-
 
   function MoveOrSack({ flag }: FlagProp) {
     function funcS() {
@@ -101,15 +121,16 @@ export default function SessionForm() {
     }
 
     function funcNo() {
+      setErrors([]);
+
       setMoveFlag(true);
 
       setBoard(backupBoard);
 
       setHand({ ...backupHand });
-      
     }
     function funcOk() {
-      alert(board.checkBoardValidity());
+      board.checkBoardValidity(setErrors);
     }
 
     if (flag) {
@@ -132,12 +153,16 @@ export default function SessionForm() {
   }
 
   function func777() {
-    const setArray = Array.from(hand.chipsInHand).sort((a, b) => a.value - b.value);
+    const setArray = Array.from(hand.chipsInHand).sort(
+      (a, b) => a.value - b.value
+    );
     hand.chipsInHand = new Set(setArray);
     setHand({ ...hand });
   }
   function func789() {
-    const setArray = Array.from(hand.chipsInHand).sort((chip1, chip2) => chip1.compare(chip2));
+    const setArray = Array.from(hand.chipsInHand).sort((chip1, chip2) =>
+      chip1.compare(chip2)
+    );
     hand.chipsInHand = new Set(setArray);
     setHand({ ...hand });
   }
@@ -155,11 +180,9 @@ export default function SessionForm() {
     const newChipSack = new ChipSack();
     setChipSack(newChipSack);
 
-
     const newBoard = new Board();
     newBoard.initCells();
     setBoard(newBoard);
-
 
     const newHand = new Hand();
     // initHand();
@@ -206,10 +229,17 @@ export default function SessionForm() {
   return (
     <div className="card">
       <div className="playing-table">
-        <BoardComponent board={board} setBoard={setBoard} click={click} selectedCell={selectedCell}/>
+        <BoardComponent
+          board={board}
+          setBoard={setBoard}
+          click={click}
+          selectedCell={selectedCell}
+        />
         <NavLink className="exitGameButtWrapper" to="/main">
           <RumButton text={"Выход"} func={() => {}} />
         </NavLink>
+
+        <Logger errors={errors} />
 
         <div className="sortButts">
           <InfoButton content="789" func={func789} />
@@ -220,7 +250,7 @@ export default function SessionForm() {
 
         <Timer time={180} func={timeIsUp} />
 
-        <HandComponent hand={hand} handClick={handClick}/>
+        <HandComponent hand={hand} handClick={handClick} />
       </div>
     </div>
   );
