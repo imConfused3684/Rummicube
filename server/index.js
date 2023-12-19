@@ -17,7 +17,10 @@ app.use('/api', userRoutes.routes);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-      origin: config.frontendUrl
+      origin: config.frontendUrl,
+      methods: ["GET", "POST"],
+      credentials: true,
+      optionsSuccessStatus: 204
   }
 });
 
@@ -25,4 +28,4 @@ io.on("connection", (socket) => {
   console.log(socket.id);
 });
 
-server.listen(config.port, () => console.log("Server is running on port 3000"));
+server.listen(config.port, () => console.log(`Server is running on port ${config.port}`));
