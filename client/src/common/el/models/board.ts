@@ -29,24 +29,39 @@ export class Board {
     }
 
     public checkBoardValidity(): boolean {
+        let errors: number[][] = [];
+        let flag: boolean = true;
+
     // [0; 3], [5; 8] — одинаковые числа
     // [10; 22] — возрастание
     for (let i = 0; i < 8; i++) {
         let row = this.cells[i].slice(0, 4);
         if (!(this.checkRow777(row))) {
-            return false;
+            errors.push([i, 1]);
+            flag = false;
         }
         row = this.cells[i].slice(5, 9);
         if (!(this.checkRow777(row))) {
-            return false;
+            errors.push([i, 2]);
+            flag = false;
         }
 
         row = this.cells[i].slice(10, 23);
         if (!(this.checkRow789(row))) {
-            return false;
+            errors.push([i, 3]);
+            flag = false;
         }
     }
-    return true;
+
+    if(!flag){
+        let s: string = "Найдены ошибки:\n";
+        errors.forEach(row => {
+            s += `Ошибка в строке ${row[0]} в ${row[1] == 3 ? "секции 1-13" : `${row[1]}й секции 1111`}\n`;
+        });
+        alert(s);
+    }
+    
+    return flag;
 }
 
 checkRow789(row: Cell[]): boolean {
