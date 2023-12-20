@@ -1,0 +1,12 @@
+.logger {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(0, -50%);
+
+    background-color: var(--aux-color);
+    border-radius: var(--border-radius);
+    padding: 0 15px;
+    color: var(--white);
+    font-size: 14px;
+}

@@ -11,7 +11,8 @@ export class Board {
         for (let i = 0; i < 8; i++) {
             const row: Cell[] = []
             for (let j = 0; j < 23; j++) {
-                row.push(new Cell(this, j, i, null, j == 4 || j == 9))
+                // row.push(new Cell(this, j, i, null, j == 4 || j == 9))
+                row.push(new Cell(j, i, null, j == 4 || j == 9))
             }
             this.cells.push(row);
         }
@@ -24,11 +25,11 @@ export class Board {
     }
 
     public addChipToCell(x: number, y: number, chip: Chip) {
-        chip.cell = this.cells[x][y];
+        // chip.cell = this.cells[x][y];
         this.cells[x][y].chip = chip;
     }
 
-    public checkBoardValidity(): boolean {
+    public checkBoardValidity(setError: (s:string[]) => void): boolean {
         let errors: number[][] = [];
         let flag: boolean = true;
 
@@ -54,11 +55,15 @@ export class Board {
         }
 
         if (!flag) {
-            let s: string = "Найдены ошибки:\n";
+            let errorsList: string[] = [];
+            // let s: string = `Найдены ошибки:\n`;
+            errorsList.push(`Найдены ошибки:\n`);
+            // let s: string = "";
             errors.forEach(row => {
-                s += `Ошибка в строке ${row[0] + 1} в ${row[1] == 3 ? "секции 1-13" : `${row[1]}й секции 1111`}\n`;
+                let s = `Ошибка в строке ${row[0] + 1} в ${row[1] == 3 ? "секции 1-13" : `${row[1]}й секции 1111`}`;
+                errorsList.push(s);
             });
-            alert(s);
+            setError(errorsList);
         }
 
         return flag;
