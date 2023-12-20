@@ -217,7 +217,8 @@ export default function SessionForm() {
         return curChip;
       }
     }
-    return new Chip(-666, Colors.YELLOW, -666, null);
+    // return new Chip(-666, Colors.YELLOW, -666, null);
+    return new Chip(-666, Colors.YELLOW, -666);
   }
 
   // function initHand() {
