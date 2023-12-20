@@ -35,19 +35,21 @@ export default function SessionForm() {
   function click(cell: Cell) {
     if (moveFlag) {
       backupBoard = new Board();
+      let id  = 0;
 
       for (let i = 0; i < 8; i++) {
         const row: Cell[] = [];
         for (let j = 0; j < 23; j++) {
           row.push(
             new Cell(
-              // backupBoard,
               j,
               i,
               board.cells[i][j].chip,
+              id,
               j == 4 || j == 9
             )
           );
+          id++;
         }
         backupBoard.cells.push(row);
       }
@@ -77,19 +79,20 @@ export default function SessionForm() {
   function handClick(chip: Chip) {
     if (moveFlag) {
       backupBoard = new Board();
-
+      let id = 0;
       for (let i = 0; i < 8; i++) {
         const row: Cell[] = [];
         for (let j = 0; j < 23; j++) {
           row.push(
             new Cell(
-              // backupBoard,
               j,
               i,
               board.cells[i][j].chip,
+              id,
               j == 4 || j == 9
             )
           );
+          id++;
         }
         backupBoard.cells.push(row);
       }
