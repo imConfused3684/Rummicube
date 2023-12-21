@@ -15,6 +15,13 @@ class Game {
         this.socket.on("createNewGame", (player, time, pnum) => this.onCreateNewGame(player, time, pnum));
 
         this.socket.on("playerConnects", (player) => this.onPlayerConnects(player));
+
+        this.socket.once("whoIsIN", (sessionId, players) => this.onwhoIsIN(sessionId, players));
+    }
+
+    onwhoIsIN(sessionId, players) {
+
+        this.socket.to(this.getRoom(sessionId)).emit("passingPlayersList", players);
     }
 
     onCreateNewGame(player, time, pnum) {
@@ -39,7 +46,7 @@ class Game {
         }
 
 
-        console.log(this.getRoomPnum(player.sessionId));
+        //console.log(this.getRoomPnum(player.sessionId));
         if (this.io.sockets.adapter.rooms.get(room)?.size === Number(this.getRoomPnum(player.sessionId))) {
             console.log("You cannot join. There's already enough players");
             this.socket.emit("error", "Данная сессия уже переполнена!");
@@ -55,6 +62,11 @@ class Game {
         console.log(`Player ${player.name} has joined! His socket: ${this.socket.id}`);
 
         console.log(this.io.sockets.adapter.rooms);
+
+        if (this.io.sockets.adapter.rooms.get(room)?.size === Number(this.getRoomPnum(player.sessionId))) {
+            this.socket.to(room).emit("gameStartsNow");
+            this.socket.emit("gameStartsNow");
+        }
     }
 
     getRoom(sessionId) {
