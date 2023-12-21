@@ -33,6 +33,7 @@ let backupBoard: Board;
 let backupHand: Hand;
 
 export default function SessionForm() {
+
   const queryParameters = new URLSearchParams(window.location.search);
   const uName = queryParameters.get("username");
   const wins = queryParameters.get("wins");
@@ -46,6 +47,7 @@ export default function SessionForm() {
   const creator = new Player(socket.id, uName!, Number(wins), sessionId);
 
   useEffect(() => {
+    players.push(uName!);
     //restart();
     if (Boolean(Number(host))) {
       const time = queryParameters.get("time");
@@ -59,19 +61,48 @@ export default function SessionForm() {
 
     }
 
+    if(!Boolean(Number(host))){
+      socket.on("passingPlayersList", (newPlayers) => {
+
+        setPlayersList(newPlayers);
+  
+      });
+    }
+
     socket.on("playerConnected", (newPlayer) => {
       //sendDataTonewPlayer(player);
+      
+      players.push(newPlayer.name);
 
-      // setConditions((s) => {
-      //   return `${s} Новый игрок ${newPlayer.name} подключился`;
-      // });
 
       let s = `Новый игрок ${newPlayer.name} подключился`;
       setConditions([s, ...conditions]);
     });
+    
+    socket.once("gameStartsNow", () => {
+
+          if(Boolean(Number(host))){
+            socket.emit("whoIsIN", creator.sessionId, players);
+          }
+
+          setGameflag(true);
+
+          if(Boolean(Number(host))){
+
+            restart();
+          }
+          else{
+            const newBoard = new Board();
+            newBoard.initCells();
+            setBoard(newBoard);
+          }
+
+        });
+    
   }, []);
 
   let firstMoveDone = false;
+  const [players, setPlayersList] = useState<String[]>([]);
   const [gameSatrted, setGameflag] = useState<boolean>(false);
   // const [serverText, setServerText] = useState<string>("");
 
@@ -152,6 +183,15 @@ export default function SessionForm() {
     }
   }
 
+  function getMyPlayingID(): number{
+    for(let i = 0; i < players.length; i++){
+      if(players[i] === uName){
+        return i;
+      }
+    }
+    return -1;
+  }
+
   function MoveOrSack({ flag }: FlagProp) {
     function funcS() {
       // initHand();
@@ -169,7 +209,11 @@ export default function SessionForm() {
       setHand({ ...backupHand });
     }
     function funcOk() {
-      board.checkBoardValidity(setErrors);
+      if(board.checkBoardValidity(setErrors)){
+        socket.emit("turnFinished", creator.sessionId, getMyPlayingID(), hand.chipsInHand.size);
+
+        
+      }
     }
 
     if (flag) {
