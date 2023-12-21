@@ -1,10 +1,19 @@
-'use strict';
-const express = require('express');
-const cors = require('cors');
-const config = require('./config');
-const userRoutes = require('./routes/user-routes');
-const { Server } = require("socket.io");
-const http = require('http');
+import express from "express";
+import cors from "cors";
+import http from "http";
+import { Server } from "socket.io";
+import config from "./config.js";
+import userRoutes from "./routes/user-routes.js";
+import Game from "./models/Game.js";
+
+// const express = require('express');
+// const cors = require('cors');
+// const config = require('./config');
+// const userRoutes = require('./routes/user-routes');
+// const { Server } = require("socket.io");
+// const http = require('http');
+
+let game;
 
 
 const app = express();
@@ -26,6 +35,11 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log(socket.id);
+
+  game = new Game(io, socket);
+
+  game.initializeGame();
+
 });
 
 server.listen(config.port, () => console.log(`Server is running on port ${config.port}`));

@@ -1,10 +1,8 @@
-'use strict';
-
-const firebase = require('../db');
-const User = require('../models/user');
+import {firebase} from '../db.js';
+import User from '../models/user.js';
 const firestore = firebase.firestore();
 
-const addUser = async (req, res, next) => {
+export const addUser = async (req, res, next) => {
     try {
         const data = req.body;
 
@@ -28,7 +26,7 @@ const addUser = async (req, res, next) => {
     }
 }
 
-const getUserWins = async (req, res, next) => {
+export const getUserWins = async (req, res, next) => {
     try {
         const data = req.body;
         let wins = null;
@@ -54,7 +52,7 @@ const getUserWins = async (req, res, next) => {
     }
 }
 
-const getUserCount = async (req, res, next) => {
+export const getUserCount = async (req, res, next) => {
     try {
         const data = req.body;
 
@@ -70,9 +68,3 @@ const getUserCount = async (req, res, next) => {
         res.status(500).send('Internal Server Error');
     }
 }
-
-module.exports = {
-    addUser,
-    getUserWins,
-    getUserCount
-};

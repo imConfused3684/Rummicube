@@ -19,7 +19,7 @@ import { Cell } from "../../common/el/models/cell";
 import Logger from "../../common/el/logger";
 
 
-import  io  from "socket.io-client";
+import {Player, socket, createNewGame} from "../../common/el/models/player"
 import { nanoid } from 'nanoid'
 // const socket = io("http://localhost:6284/");
 //   socket.on("connect", () => {
@@ -34,13 +34,49 @@ let backupBoard: Board;
 let backupHand: Hand;
 
 export default function SessionForm() {
-  const [moveFlag, setMoveFlag] = useState<boolean>(true);
-  const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
-  const [errors, setErrors] = useState<string[]>([]);
+  const queryParameters = new URLSearchParams(window.location.search);
+  const uName = queryParameters.get("username");
+  const wins = queryParameters.get("wins");
+  const host = queryParameters.get("host");
+
+  const sessionId = nanoid();
+  const creator = new Player(socket.id, uName!, Number(wins), sessionId);
+
+  useEffect(() => {
+    //restart();
+    if(Boolean(Number(host))){
+      const time = queryParameters.get("time");
+      const pnum = queryParameters.get("pnum");
+
+      createNewGame(creator, Number(time), Number(pnum));
+      setServerText("Код сессии: " + sessionId + ". Ожидаем игроков");
+    }else{
+      setServerText("Вы успешно подключились. Ожидаем игроков");
+    }
+
+    socket.on("playerConnected", (newPlayer) => {
+
+      //sendDataTonewPlayer(player);
+
+      setServerText((s)=>{
+        return  `${s} Новый игрок ${newPlayer.name} подключился`;
+      });
+
+    });
+    
+  }, []);
+
 
   let firstMoveDone = false;
   const [gameSatrted, setGameflag] = useState<boolean>(false);
   const [serverText, setServerText] = useState<string>("");
+
+
+  const [moveFlag, setMoveFlag] = useState<boolean>(true);
+  const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
+  const [errors, setErrors] = useState<string[]>([]);
+
+ 
 
   function click(cell: Cell) {
     if (moveFlag) {
@@ -185,10 +221,7 @@ export default function SessionForm() {
   const [chipSack, setChipSack] = useState(new ChipSack());
   const [hand, setHand] = useState(new Hand());
 
-  useEffect(() => {
-    //restart();
-    setServerText(nanoid());
-  }, []);
+
 
   function restart() {
     const newChipSack = new ChipSack();

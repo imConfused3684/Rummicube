@@ -5,23 +5,43 @@ import "../authorizationForm/authorizationForm.css"
 import { useNavigate } from "react-router-dom";
 
 import { useState } from "react";
-
-import  io  from "socket.io-client";
+import {Player, socket, playerConnects} from "../../common/el/models/player"
 
 export default function connectionForm() {
   const navigate = useNavigate();
 
   const [sessionId, setSessionId] = useState<string>("");
 
-  function connectFunc(){ 
-    console.log(sessionId);
-    //navigate(`/game/?username=${username}&wins=${wins}&host=false`);
-  }
-
-
   const queryParameters = new URLSearchParams(window.location.search);
   const uName = queryParameters.get("username");
   const wins = queryParameters.get("wins");
+
+  let player = new Player(socket.id, uName!, Number(wins));
+
+  function connectFunc(){ 
+    console.log(sessionId);
+    //navigate(`/game/?username=${username}&wins=${wins}&host=false`);
+
+    if (sessionId === "") {
+      alert("Введите код сессии");
+      return;
+    }
+
+    player.sessionId = sessionId;
+
+    playerConnects(player);
+
+    socket.on("error", (message) => {
+        alert(message);
+        return;
+    });
+
+    // redirect only after first player got 'playerConnected' event
+    socket.once("connectedToServer", () => {
+        navigate(`/game/?username=${uName}&wins=${wins}&host=0`);
+    });
+  }
+
 
     return (
       <div className="card">
