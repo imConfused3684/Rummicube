@@ -8,7 +8,6 @@ export class ChipSack {
 
     constructor() {
         this.chips = new Set<Chip>();
-        this.initChips();
     }
 
     public initChips() {

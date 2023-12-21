@@ -18,6 +18,14 @@ import { Colors } from "../../common/el/models/colors";
 import { Cell } from "../../common/el/models/cell";
 import Logger from "../../common/el/logger";
 
+
+import  io  from "socket.io-client";
+import { nanoid } from 'nanoid'
+// const socket = io("http://localhost:6284/");
+//   socket.on("connect", () => {
+//     console.log(socket.id);
+//   });
+
 interface FlagProp {
   flag: boolean;
 }
@@ -30,7 +38,9 @@ export default function SessionForm() {
   const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
 
-
+  let firstMoveDone = false;
+  const [gameSatrted, setGameflag] = useState<boolean>(false);
+  const [serverText, setServerText] = useState<string>("");
 
   function click(cell: Cell) {
     if (moveFlag) {
@@ -176,11 +186,13 @@ export default function SessionForm() {
   const [hand, setHand] = useState(new Hand());
 
   useEffect(() => {
-    restart();
+    //restart();
+    setServerText(nanoid());
   }, []);
 
   function restart() {
     const newChipSack = new ChipSack();
+    newChipSack.initChips();
     setChipSack(newChipSack);
 
     const newBoard = new Board();
@@ -238,6 +250,8 @@ export default function SessionForm() {
           setBoard={setBoard}
           click={click}
           selectedCell={selectedCell}
+          gameStarted={gameSatrted}
+          text={serverText}
         />
         <NavLink className="exitGameButtWrapper" to="/main">
           <RumButton text={"Выход"} func={() => {}} />
