@@ -8,7 +8,7 @@ import { Hand } from "../../common/el/models/hand";
 import { Chip } from "../../common/el/models/chip";
 
 import "./sessionForm.css";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import HandComponent from "../../common/el/handComponent";
@@ -18,9 +18,8 @@ import { Colors } from "../../common/el/models/colors";
 import { Cell } from "../../common/el/models/cell";
 import Logger from "../../common/el/logger";
 
-
-import {Player, socket, createNewGame} from "../../common/el/models/player"
-import { nanoid } from 'nanoid'
+import { Player, socket, createNewGame } from "../../common/el/models/player";
+import { nanoid } from "nanoid";
 // const socket = io("http://localhost:6284/");
 //   socket.on("connect", () => {
 //     console.log(socket.id);
@@ -39,6 +38,10 @@ export default function SessionForm() {
   const uName = queryParameters.get("username");
   const wins = queryParameters.get("wins");
   const host = queryParameters.get("host");
+  const timeString = queryParameters.get("time");
+  const time = timeString ? parseInt(timeString, 10) : 0;
+
+  const pnum = queryParameters.get("pnum");
 
   const sessionId = nanoid();
   const creator = new Player(socket.id, uName!, Number(wins), sessionId);
@@ -46,14 +49,16 @@ export default function SessionForm() {
   useEffect(() => {
     players.push(uName!);
     //restart();
-    if(Boolean(Number(host))){
+    if (Boolean(Number(host))) {
       const time = queryParameters.get("time");
       const pnum = queryParameters.get("pnum");
 
       createNewGame(creator, Number(time), Number(pnum));
-      setServerText("Код сессии: " + sessionId + ". Ожидаем игроков");
-    }else{
-      setServerText("Вы успешно подключились. Ожидаем игроков");
+      setConditions(["Код сессии: " + sessionId + ". Ожидаем игроков", ...conditions]);
+
+    } else {
+      setConditions(["Вы успешно подключились. Ожидаем игроков", ...conditions]);
+
     }
 
     if(!Boolean(Number(host))){
@@ -65,68 +70,57 @@ export default function SessionForm() {
     }
 
     socket.on("playerConnected", (newPlayer) => {
-
       //sendDataTonewPlayer(player);
-
+      
       players.push(newPlayer.name);
 
-      setServerText((s)=>{
-        return  `${s} Новый игрок ${newPlayer.name} подключился`;
-      });
 
-    });
-
-    socket.once("gameStartsNow", () => {
-
-      if(Boolean(Number(host))){
-        socket.emit("whoIsIN", creator.sessionId, players);
-      }
-
-      setGameflag(true);
-
-      if(Boolean(Number(host))){
-        
-        restart();
-      }
-      else{
-        const newBoard = new Board();
-        newBoard.initCells();
-        setBoard(newBoard);
-      }
-      
+      let s = `Новый игрок ${newPlayer.name} подключился`;
+      setConditions([s, ...conditions]);
     });
     
-  }, []);
+    socket.once("gameStartsNow", () => {
 
+          if(Boolean(Number(host))){
+            socket.emit("whoIsIN", creator.sessionId, players);
+          }
+
+          setGameflag(true);
+
+          if(Boolean(Number(host))){
+
+            restart();
+          }
+          else{
+            const newBoard = new Board();
+            newBoard.initCells();
+            setBoard(newBoard);
+          }
+
+        });
+    
+  }, []);
 
   let firstMoveDone = false;
   const [players, setPlayersList] = useState<String[]>([]);
   const [gameSatrted, setGameflag] = useState<boolean>(false);
-  const [serverText, setServerText] = useState<string>("");
-
+  // const [serverText, setServerText] = useState<string>("");
 
   const [moveFlag, setMoveFlag] = useState<boolean>(true);
   const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
-
- 
+  const [conditions, setConditions] = useState<string[]>([]);
 
   function click(cell: Cell) {
     if (moveFlag) {
       backupBoard = new Board();
-      let id  = 0;
+      let id = 0;
 
       for (let i = 0; i < 8; i++) {
         const row: Cell[] = [];
         for (let j = 0; j < 23; j++) {
           row.push(
-            new Cell(
-              j,
-              i,
-              board.cells[i][j].chip,
-              id,
-              j == 4 || j == 9
-            )
+            new Cell(j, i, board.cells[i][j].chip, id, j == 4 || j == 9)
           );
           id++;
         }
@@ -163,13 +157,7 @@ export default function SessionForm() {
         const row: Cell[] = [];
         for (let j = 0; j < 23; j++) {
           row.push(
-            new Cell(
-              j,
-              i,
-              board.cells[i][j].chip,
-              id,
-              j == 4 || j == 9
-            )
+            new Cell(j, i, board.cells[i][j].chip, id, j == 4 || j == 9)
           );
           id++;
         }
@@ -232,6 +220,7 @@ export default function SessionForm() {
       return (
         <div className="sackWrapper">
           <InfoButton
+            // content={<img src="./src/assets/sack.svg" />}
             content={<img src="../../src/assets/sack.svg" />}
             func={() => funcS()}
           />
@@ -266,8 +255,6 @@ export default function SessionForm() {
   const [board, setBoard] = useState(new Board());
   const [chipSack, setChipSack] = useState(new ChipSack());
   const [hand, setHand] = useState(new Hand());
-
-
 
   function restart() {
     const newChipSack = new ChipSack();
@@ -330,7 +317,7 @@ export default function SessionForm() {
           click={click}
           selectedCell={selectedCell}
           gameStarted={gameSatrted}
-          text={serverText}
+          text={conditions}
         />
         <NavLink className="exitGameButtWrapper" to="/main">
           <RumButton text={"Выход"} func={() => {}} />
@@ -345,10 +332,10 @@ export default function SessionForm() {
 
         <MoveOrSack flag={moveFlag} />
 
-        <Timer time={180} func={timeIsUp} />
+        <Timer time={time} func={timeIsUp} />
 
-        <HandComponent hand={hand} handClick={handClick} />
       </div>
+      <HandComponent hand={hand} handClick={handClick} />
     </div>
   );
 }

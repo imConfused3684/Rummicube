@@ -1,6 +1,7 @@
 import React/*, { useState }*/ from "react";
 import "../styles/board.css";
 import CellComponent from "./cellComponent";
+import ConditionComponent from "./conditionComponent";
 import UpperCell from "./upperCell";
 import { Board } from "./models/board";
 
@@ -12,7 +13,7 @@ interface boardProps {
   click: (cell: Cell) => void;
   selectedCell: Cell | null;
   gameStarted: boolean;
-  text: string;
+  text: string[];
 }
 
 export default function BoardComponent({ board, setBoard, click, selectedCell, gameStarted, text }: boardProps) {
@@ -52,7 +53,8 @@ export default function BoardComponent({ board, setBoard, click, selectedCell, g
     );
   }
   else{
-    return ( <p>{text}</p> );
+    // return ( <p>{text}</p> );
+    return ( <ConditionComponent conditions={text}/> );
   }
 
   

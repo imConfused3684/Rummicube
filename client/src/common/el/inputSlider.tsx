@@ -10,6 +10,10 @@ interface InputProps {
   label: string;
 }
 
+interface InputSliderProps extends InputProps {
+  onValueChange: (value: number) => void;
+}
+
 export default function InputSlider({
   name,
   min,
@@ -17,11 +21,18 @@ export default function InputSlider({
   value,
   step,
   label,
-}: InputProps) {
+  onValueChange,
+}: InputSliderProps) {
   const [val, setValue] = useState(value);
 
+  // const handleSliderChange = (event: { target: { value: any } }) => {
+  //   setValue(event.target.value);
+  // };
+
   const handleSliderChange = (event: { target: { value: any } }) => {
-    setValue(event.target.value);
+    const newValue = event.target.value;
+    setValue(newValue);
+    onValueChange(newValue); // Вызываем колбэк и передаем новое значение
   };
 
   return (
