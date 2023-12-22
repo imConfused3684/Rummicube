@@ -3,6 +3,7 @@ import RumButton from "../../common/el/rumButton";
 import InfoButton from "../../common/el/infoButton";
 import "./firstForm.css";
 import { NavLink } from "react-router-dom";
+import DevInformationComponent from "../../common/el/devInformationComponent";
 
 export default function FirstForm() {
   const queryParameters = new URLSearchParams(window.location.search);
@@ -10,6 +11,13 @@ export default function FirstForm() {
   const wins = queryParameters.get("wins");
 
   function func() {}
+
+  function showDevInformation() {
+    const devInfo = document.querySelector('.dev-info') as HTMLElement;
+    if (devInfo != null) {
+      devInfo.style.display = "flex";
+    }
+  }
 
   return (
     <>
@@ -26,10 +34,12 @@ export default function FirstForm() {
           <RumButton text="Подключиться к игре" func={func} />
         </NavLink>
 
+        <DevInformationComponent />
+
         <div className="bottom-panel">
           <InfoButton content="i" func={func} />
 
-          <InfoButton content="?" func={func} />
+          <InfoButton content="?" func={showDevInformation} />
         </div>
       </div>
     </>
