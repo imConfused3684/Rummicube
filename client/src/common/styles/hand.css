@@ -11,7 +11,7 @@
     gap: 3px;
 
     position: absolute;
-    bottom: 0;
+    bottom: 4%;
     left: 50%;
     transform: translate(-50%, 0);
 }

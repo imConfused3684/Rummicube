@@ -17,10 +17,40 @@ class Game {
         this.socket.on("playerConnects", (player) => this.onPlayerConnects(player));
 
         this.socket.once("whoIsIN", (sessionId, players) => this.onwhoIsIN(sessionId, players));
+
+        this.socket.once("gameStarts", (sessionId) => this.gameStartsNow(sessionId));
+
+        this.socket.on("turnFinished", (sessionId, prevPId, prevPhandSize, boardCells, chipSackChips) => this.turnFinished(sessionId, prevPId, prevPhandSize, boardCells, chipSackChips));
+    }
+
+    turnFinished(sessionId, prevPId, prevPhandSize, boardCells, chipSackChips) {
+        
+
+        let newId = -1;
+        if(Number(prevPId) === this.getRoomPnum(sessionId)-1){
+            newId = 0;
+        }
+        else{
+            newId = Number(prevPId) + 1;
+        }
+
+        console.log("newId: " + newId)
+
+        if(Number(prevPhandSize) === 0){
+            this.socket.to(this.getRoom(sessionId)).emit("heWon", prevPId);
+            return;
+        }
+
+        this.socket.to(this.getRoom(sessionId)).emit("newTurn", newId, boardCells, chipSackChips);
+    }
+
+    gameStartsNow(sessionId) {
+        console.log("gameStartsNow " + sessionId);
+        this.socket.to(this.getRoom(sessionId)).emit("gameStartsNow");
     }
 
     onwhoIsIN(sessionId, players) {
-
+        console.log("onwhoIsIN " + sessionId);
         this.socket.to(this.getRoom(sessionId)).emit("passingPlayersList", players);
     }
 
@@ -64,8 +94,9 @@ class Game {
         console.log(this.io.sockets.adapter.rooms);
 
         if (this.io.sockets.adapter.rooms.get(room)?.size === Number(this.getRoomPnum(player.sessionId))) {
-            this.socket.to(room).emit("gameStartsNow");
-            this.socket.emit("gameStartsNow");
+            this.socket.to(room).emit("uCanStart");
+            // this.socket.to(room).emit("gameStartsNow");
+            // this.socket.emit("gameStartsNow");
         }
     }
 

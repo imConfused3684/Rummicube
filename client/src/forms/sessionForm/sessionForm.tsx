@@ -32,6 +32,8 @@ interface FlagProp {
 let backupBoard: Board;
 let backupHand: Hand;
 
+const sessionId = nanoid();
+
 export default function SessionForm() {
 
   const queryParameters = new URLSearchParams(window.location.search);
@@ -41,10 +43,17 @@ export default function SessionForm() {
   const timeString = queryParameters.get("time");
   const time = timeString ? parseInt(timeString, 10) : 0;
 
-  const pnum = queryParameters.get("pnum");
+  
+  let creator: Player;
 
-  const sessionId = nanoid();
-  const creator = new Player(socket.id, uName!, Number(wins), sessionId);
+  if(Boolean(Number(host))){
+    creator = new Player(socket.id, uName!, Number(wins), sessionId);
+  }
+  else{
+    const sesid = queryParameters.get("sesid");
+    console.log(sesid);
+    creator = new Player(socket.id, uName!, Number(wins), sesid!);
+  }
 
   useEffect(() => {
     players.push(uName!);
@@ -61,10 +70,53 @@ export default function SessionForm() {
 
     }
 
+    socket.on("newTurn", (newId, boardCells, chipSackChips) => {
+      let newBoard = new Board();
+      newBoard.cells = boardCells;
+
+      setBoard(newBoard);
+
+
+      console.log(chipSackChips);
+      let newChipSack = new ChipSack();
+      
+      chipSackChips.forEach((chip: { id: number; color: Colors; value: number; }) => {
+        newChipSack.chips.add(new Chip(chip.id, chip.color, chip.value));
+      });
+
+
+      console.log(newChipSack.chips);
+      setChipSack(newChipSack);
+
+      console.log(`newId: ${newId} turn`)
+      console.log(`its ${players[newId]} turn`);
+      if(players[newId] == uName){
+        console.log("ITS MY TURN " + hand.chipsInHand.size)
+        if(hand.chipsInHand.size == 0){
+          console.log("hand init needed");
+          for (let i = 0; i < 14; i++) {
+            getRandomChipToHand(chipSack, hand);
+          }
+          setHand({ ...hand });
+        }
+
+        setCanMove(true);
+
+
+      }
+        
+    });
+
+    socket.on("uCanStart", ()=>{
+      setcanstart(true);
+    });
+
     if(!Boolean(Number(host))){
       socket.on("passingPlayersList", (newPlayers) => {
+        console.log(newPlayers);
+        players = newPlayers;
 
-        setPlayersList(newPlayers);
+        console.log(players);
   
       });
     }
@@ -81,9 +133,11 @@ export default function SessionForm() {
     
     socket.once("gameStartsNow", () => {
 
-          if(Boolean(Number(host))){
-            socket.emit("whoIsIN", creator.sessionId, players);
-          }
+          // if(Boolean(Number(host))){
+          //   console.log(players);
+          //   console.log(creator.sessionId);
+          //   socket.emit("whoIsIN", creator.sessionId, players);
+          // }
 
           setGameflag(true);
 
@@ -102,90 +156,97 @@ export default function SessionForm() {
   }, []);
 
   let firstMoveDone = false;
-  const [players, setPlayersList] = useState<String[]>([]);
+  let [players, setPlayersList] = useState<Array<any>>([]);
   const [gameSatrted, setGameflag] = useState<boolean>(false);
   // const [serverText, setServerText] = useState<string>("");
 
+  const [canMove, setCanMove] = useState<boolean>(false);
   const [moveFlag, setMoveFlag] = useState<boolean>(true);
   const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [conditions, setConditions] = useState<string[]>([]);
 
   function click(cell: Cell) {
-    if (moveFlag) {
-      backupBoard = new Board();
-      let id = 0;
-
-      for (let i = 0; i < 8; i++) {
-        const row: Cell[] = [];
-        for (let j = 0; j < 23; j++) {
-          row.push(
-            new Cell(j, i, board.cells[i][j].chip, id, j == 4 || j == 9)
-          );
-          id++;
+    if(canMove){
+      if (moveFlag) {
+        backupBoard = new Board();
+        let id = 0;
+  
+        for (let i = 0; i < 8; i++) {
+          const row: Cell[] = [];
+          for (let j = 0; j < 23; j++) {
+            row.push(
+              new Cell(j, i, board.cells[i][j].chip, id, j == 4 || j == 9)
+            );
+            id++;
+          }
+          backupBoard.cells.push(row);
         }
-        backupBoard.cells.push(row);
+  
+        backupHand = new Hand();
+        hand.chipsInHand.forEach((chip) => {
+          backupHand.chipsInHand.add(chip);
+        });
+  
+        setMoveFlag(false);
       }
-
-      backupHand = new Hand();
-      hand.chipsInHand.forEach((chip) => {
-        backupHand.chipsInHand.add(chip);
-      });
-
-      setMoveFlag(false);
-    }
-
-    if (
-      selectedCell &&
-      selectedCell != cell &&
-      selectedCell.chip?.canMove(cell)
-    ) {
-      selectedCell.moveChip(cell);
-      setSelectedCell(null);
-    } else if (selectedCell == cell) {
-      setSelectedCell(null);
-    } else {
-      setSelectedCell(cell);
+  
+      if (
+        selectedCell &&
+        selectedCell != cell &&
+        selectedCell.chip?.canMove(cell)
+      ) {
+        selectedCell.moveChip(cell);
+        setSelectedCell(null);
+      } else if (selectedCell == cell) {
+        setSelectedCell(null);
+      } else {
+        setSelectedCell(cell);
+      }
     }
   }
 
   function handClick(chip: Chip) {
-    if (moveFlag) {
-      backupBoard = new Board();
-      let id = 0;
-      for (let i = 0; i < 8; i++) {
-        const row: Cell[] = [];
-        for (let j = 0; j < 23; j++) {
-          row.push(
-            new Cell(j, i, board.cells[i][j].chip, id, j == 4 || j == 9)
-          );
-          id++;
+    if(canMove){
+      if (moveFlag) {
+        backupBoard = new Board();
+        let id = 0;
+        for (let i = 0; i < 8; i++) {
+          const row: Cell[] = [];
+          for (let j = 0; j < 23; j++) {
+            row.push(
+              new Cell(j, i, board.cells[i][j].chip, id, j == 4 || j == 9)
+            );
+            id++;
+          }
+          backupBoard.cells.push(row);
         }
-        backupBoard.cells.push(row);
+  
+        backupHand = new Hand();
+        hand.chipsInHand.forEach((chip) => {
+          backupHand.chipsInHand.add(chip);
+        });
+  
+        setMoveFlag(false);
       }
-
-      backupHand = new Hand();
-      hand.chipsInHand.forEach((chip) => {
-        backupHand.chipsInHand.add(chip);
-      });
-
-      setMoveFlag(false);
-    }
-
-    if (selectedCell && selectedCell.chip === null) {
-      selectedCell.chip = chip;
-      hand.chipsInHand.delete(chip);
-
-      setSelectedCell(null);
-      setHand({ ...hand });
-    } else {
-      console.log("aasdasds");
+  
+      if (selectedCell && selectedCell.chip === null) {
+        selectedCell.chip = chip;
+        hand.chipsInHand.delete(chip);
+  
+        setSelectedCell(null);
+        setHand({ ...hand });
+      } else {
+        console.log("aasdasds");
+      }
     }
   }
 
   function getMyPlayingID(): number{
+    console.log(players);
+
     for(let i = 0; i < players.length; i++){
-      if(players[i] === uName){
+      if(String(players[i]).match(String(uName))){
         return i;
       }
     }
@@ -194,9 +255,11 @@ export default function SessionForm() {
 
   function MoveOrSack({ flag }: FlagProp) {
     function funcS() {
-      // initHand();
-      getRandomChipToHand(chipSack, hand);
-      setHand({ ...hand }); // Обновите состояние руки
+      if(canMove){
+        // initHand();
+        getRandomChipToHand(chipSack, hand);
+        setHand({ ...hand }); // Обновите состояние руки
+      }
     }
 
     function funcNo() {
@@ -208,11 +271,14 @@ export default function SessionForm() {
 
       setHand({ ...backupHand });
     }
+
     function funcOk() {
       if(board.checkBoardValidity(setErrors)){
-        socket.emit("turnFinished", creator.sessionId, getMyPlayingID(), hand.chipsInHand.size);
+        console.log("my finish id" + getMyPlayingID());
+        socket.emit("turnFinished", creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
 
-        
+        setMoveFlag(true);
+        setCanMove(false);
       }
     }
 
@@ -308,6 +374,23 @@ export default function SessionForm() {
   //   }
   // }
 
+  const [canstart, setcanstart] = useState<boolean>(false);
+  function startFunc(){
+    console.log(sessionId);
+    socket.emit("gameStarts", sessionId);
+
+    console.log(players);
+    console.log(creator.sessionId);
+    socket.emit("whoIsIN", creator.sessionId, players);
+
+    setGameflag(true);
+
+    restart();
+
+    setCanMove(true);
+  }
+  
+
   return (
     <div className="card">
       <div className="playing-table">
@@ -318,6 +401,8 @@ export default function SessionForm() {
           selectedCell={selectedCell}
           gameStarted={gameSatrted}
           text={conditions}
+          start={canstart && Boolean(Number(host))}
+          func={() => startFunc()}
         />
         <NavLink className="exitGameButtWrapper" to="/main">
           <RumButton text={"Выход"} func={() => {}} />

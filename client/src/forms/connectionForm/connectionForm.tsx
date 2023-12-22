@@ -38,7 +38,7 @@ export default function connectionForm() {
 
     // redirect only after first player got 'playerConnected' event
     socket.once("connectedToServer", () => {
-        navigate(`/game/?username=${uName}&wins=${wins}&host=0`);
+        navigate(`/game/?username=${uName}&wins=${wins}&host=0&sesid=${sessionId}`);
     });
   }
 

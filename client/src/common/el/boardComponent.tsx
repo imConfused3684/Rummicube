@@ -14,9 +14,13 @@ interface boardProps {
   selectedCell: Cell | null;
   gameStarted: boolean;
   text: string[];
+
+  
+  start: boolean;
+  func: () => void;
 }
 
-export default function BoardComponent({ board, setBoard, click, selectedCell, gameStarted, text }: boardProps) {
+export default function BoardComponent({ board, setBoard, click, selectedCell, gameStarted, text, start, func}: boardProps) {
   
 
   const upperCellsSmallSection = Array.from({ length: 4 }, (_, index) => (
@@ -54,7 +58,7 @@ export default function BoardComponent({ board, setBoard, click, selectedCell, g
   }
   else{
     // return ( <p>{text}</p> );
-    return ( <ConditionComponent conditions={text}/> );
+    return ( <ConditionComponent conditions={text} start={start} func={func}/> );
   }
 
   
