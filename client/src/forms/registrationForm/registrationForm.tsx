@@ -39,11 +39,13 @@ export default function registrationForm() {
         bigText="Придумайте логин"
         lilText="от 4 до 16 латинских букв, цифр и подчёркиваний"
         onChange={setUsername}
+        isPassword={false}
       />
       <Input
         bigText="Введите пароль"
         lilText="от 4 до 16 латинских букв, цифр и подчёркиваний"
         onChange={setPassword}
+        isPassword={true}
       />
       <RumButton text={"Зарегистрироваться"} func={func} />
 
