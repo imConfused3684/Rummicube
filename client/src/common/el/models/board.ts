@@ -140,6 +140,13 @@ export class Board {
             }
         });
 
+        if(startFlag && checked < 3){
+            flag = false;
+        }
+
+        
+
+
         return flag;
     }
 
