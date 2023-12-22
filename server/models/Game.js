@@ -25,6 +25,10 @@ class Game {
 
     turnFinished(sessionId, prevPId, prevPhandSize, boardCells, chipSackChips) {
         
+        if(Number(prevPhandSize) === 0){
+            this.socket.to(this.getRoom(sessionId)).emit("heWon", prevPId, boardCells);
+            return;
+        }
 
         let newId = -1;
         if(Number(prevPId) === this.getRoomPnum(sessionId)-1){
@@ -34,12 +38,7 @@ class Game {
             newId = Number(prevPId) + 1;
         }
 
-        console.log("newId: " + newId)
-
-        if(Number(prevPhandSize) === 0){
-            this.socket.to(this.getRoom(sessionId)).emit("heWon", prevPId);
-            return;
-        }
+        console.log("newId: " + newId);
 
         this.socket.to(this.getRoom(sessionId)).emit("newTurn", newId, boardCells, chipSackChips);
     }

@@ -18,7 +18,7 @@ import { Colors } from "../../common/el/models/colors";
 import { Cell } from "../../common/el/models/cell";
 import Logger from "../../common/el/logger";
 
-import { Player, socket, createNewGame } from "../../common/el/models/player";
+import { Player, socket, createNewGame, turnFinished } from "../../common/el/models/player";
 import { nanoid } from "nanoid";
 // const socket = io("http://localhost:6284/");
 //   socket.on("connect", () => {
@@ -34,6 +34,7 @@ let backupHand: Hand;
 
 const sessionId = nanoid();
 let players: string[] = [];
+let permanentHand: Hand = new Hand();
 
 export default function SessionForm() {
   const queryParameters = new URLSearchParams(window.location.search);
@@ -69,6 +70,19 @@ export default function SessionForm() {
       setConditions(["Вы успешно подключились. Ожидаем игроков", ...conditions]);
 
     }
+
+    socket.on("heWon", (winnerId, boardCells) => {
+      let newBoard = new Board();
+      newBoard.cells = boardCells;
+      setBoard(newBoard);
+
+      if(players[winnerId] == uName){
+        alert("Вы победили!");
+      }
+      else{
+        alert(`Игрок ${players[winnerId]} победил`);
+      }
+    });
 
     socket.on("newTurn", (newId, boardCells, chipSackChips) => {
       let newBoard = new Board();
@@ -120,8 +134,8 @@ export default function SessionForm() {
 
         setWhosTurn(`Сейчас мой ход`);
 
-        console.log("ITS MY TURN " + hand.chipsInHand.size)
-        if(hand.chipsInHand.size == 0){
+        console.log("ITS MY TURN. hand: " + hand.chipsInHand.size)
+        if(permanentHand.chipsInHand.size == 0){
           console.log("hand init needed");
           
           
@@ -131,6 +145,9 @@ export default function SessionForm() {
             newHand.chipsInHand.add(getRandomChip(newChipSack));
           }
           setHand(newHand);
+        }
+        else{
+          setHand(permanentHand);
         }
       }
       else{
@@ -201,6 +218,7 @@ export default function SessionForm() {
   const [conditions, setConditions] = useState<string[]>([]);
 
   function click(cell: Cell) {
+
     if(canMove){
       if (moveFlag) {
         backupBoard = new Board();
@@ -292,6 +310,23 @@ export default function SessionForm() {
       // initHand();
       getRandomChipToHand(chipSack, hand);
       setHand({ ...hand }); // Обновите состояние руки
+
+      turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
+
+      permanentHand.chipsInHand = new Set<Chip>;
+        hand.chipsInHand.forEach(chip => {
+          permanentHand.chipsInHand.add(chip);
+        });
+
+      let newId = 0;
+      if(!(getMyPlayingID() == players.length - 1)){
+        newId = getMyPlayingID() + 1;
+      }
+
+      setWhosTurn(`Сейчас ходит ${players[newId]}`);
+
+      setMoveFlag(true);
+      setCanMove(false);
     }
   }
 
@@ -311,8 +346,12 @@ export default function SessionForm() {
     function funcOk() {
       if(board.checkBoardValidity(setErrors)){
         console.log("my finish id" + getMyPlayingID());
-        socket.emit("turnFinished", creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
+        turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
 
+        permanentHand.chipsInHand = new Set<Chip>;
+        hand.chipsInHand.forEach(chip => {
+          permanentHand.chipsInHand.add(chip);
+        });
 
         let newId = 0;
         if(!(getMyPlayingID() == players.length - 1)){
@@ -323,6 +362,11 @@ export default function SessionForm() {
 
         setMoveFlag(true);
         setCanMove(false);
+
+        if(hand.chipsInHand.size == 0){
+          setWhosTurn(`Вы победили!`);
+          alert("Вы победили!");
+        }
       }
     }
 
