@@ -14,7 +14,7 @@ export class Cell {
 
             this.x = x;
             this.y = y;
-            this.chip = null;
+            this.chip = chip;
             // this.id = Math.random();
             this.id = id;
             this.availbale = false;
