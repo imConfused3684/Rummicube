@@ -112,8 +112,13 @@ export default function SessionForm() {
 
       console.log(`newId: ${newId} turn`)
       console.log(`its ${players[newId]} turn`);
+
+      
+
       if(players[newId] == uName){
         setCanMove(true);
+
+        setWhosTurn(`Сейчас мой ход`);
 
         console.log("ITS MY TURN " + hand.chipsInHand.size)
         if(hand.chipsInHand.size == 0){
@@ -127,6 +132,9 @@ export default function SessionForm() {
           }
           setHand(newHand);
         }
+      }
+      else{
+        setWhosTurn(`Сейчас ходит ${players[newId]}`);
       }
         
       setChipSack(newChipSack);
@@ -143,7 +151,7 @@ export default function SessionForm() {
         //setPlayersList(players);
 
         console.log(players);
-  
+        
       });
     }
 
@@ -305,6 +313,14 @@ export default function SessionForm() {
         console.log("my finish id" + getMyPlayingID());
         socket.emit("turnFinished", creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
 
+
+        let newId = 0;
+        if(!(getMyPlayingID() == players.length - 1)){
+          newId = getMyPlayingID() + 1;
+        }
+
+        setWhosTurn(`Сейчас ходит ${players[newId]}`);
+
         setMoveFlag(true);
         setCanMove(false);
       }
@@ -418,10 +434,13 @@ export default function SessionForm() {
     setCanMove(true);
   }
   
-
+  const [whosTurn, setWhosTurn] = useState<string>("");
   return (
     <div className="card">
       <div className="playing-table">
+
+        <p style={{color: "white", position: "absolute", top: "10px"}}>{whosTurn}</p>
+
         <BoardComponent
           board={board}
           setBoard={setBoard}
