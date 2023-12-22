@@ -23,3 +23,7 @@ export function playerConnects(player: Player | undefined) {
 export function createNewGame(player: Player | undefined, time: number, pnum: number) {
     socket.emit("createNewGame", player, time, pnum);
 }
+
+export function turnFinished(sessionId: string | undefined, prevPid: number, prevPhandSize: number, boardCells: any[][], chips: any[]) {
+    socket.emit("turnFinished", sessionId, prevPid, prevPhandSize, boardCells, chips);
+}
