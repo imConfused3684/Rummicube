@@ -53,6 +53,7 @@ export default function connectionForm() {
         bigText='Введите код комнаты:'
         lilText=''
         onChange={setSessionId}
+        isPassword={false}
       />
       <RumButton text={"Подключиться"} func={connectFunc} />
 
