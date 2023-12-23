@@ -34,7 +34,7 @@ let backupHand: Hand;
 
 const sessionId = nanoid();
 let players: string[] = [];
-let permanentHand: Hand = new Hand();
+let permanentChipsInHand: Set<Chip> = new Set<Chip>;
 
 export default function SessionForm() {
   const queryParameters = new URLSearchParams(window.location.search);
@@ -81,10 +81,12 @@ export default function SessionForm() {
       }
       else{
         alert(`Игрок ${players[winnerId]} победил`);
+        setWhosTurn(`Игрок ${players[winnerId]} победил`);
       }
     });
 
     socket.on("newTurn", (newId, boardCells, chipSackChips) => {
+      setChipPlaced(false);
       let newBoard = new Board();
       //newBoard.cells = boardCells;
 
@@ -134,8 +136,8 @@ export default function SessionForm() {
 
         setWhosTurn(`Сейчас мой ход`);
 
-        console.log("ITS MY TURN. hand: " + hand.chipsInHand.size)
-        if(permanentHand.chipsInHand.size == 0){
+        console.log("ITS MY TURN. hand: " + permanentChipsInHand.size)
+        if(permanentChipsInHand.size == 0){
           console.log("hand init needed");
           
           
@@ -147,7 +149,9 @@ export default function SessionForm() {
           setHand(newHand);
         }
         else{
-          setHand(permanentHand);
+          let newHand = new Hand();
+          newHand.chipsInHand = permanentChipsInHand;
+          setHand(newHand);
         }
       }
       else{
@@ -209,6 +213,7 @@ export default function SessionForm() {
   let firstMoveDone = false;
   //let [players, setPlayersList] = useState<Array<any>>([]);
   const [gameSatrted, setGameflag] = useState<boolean>(false);
+  const [chipPlaced, setChipPlaced] = useState<boolean>(false);
   // const [serverText, setServerText] = useState<string>("");
 
   const [canMove, setCanMove] = useState<boolean>(false);
@@ -286,6 +291,7 @@ export default function SessionForm() {
   
         setSelectedCell(null);
         setHand({ ...hand });
+        setChipPlaced(true);
 
         setMoveFlag(false);
       } else {
@@ -313,9 +319,9 @@ export default function SessionForm() {
 
       turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
 
-      permanentHand.chipsInHand = new Set<Chip>;
+      permanentChipsInHand = new Set<Chip>;
         hand.chipsInHand.forEach(chip => {
-          permanentHand.chipsInHand.add(chip);
+          permanentChipsInHand.add(chip);
         });
 
       let newId = 0;
@@ -344,30 +350,38 @@ export default function SessionForm() {
     }
 
     function funcOk() {
-      if(board.checkBoardValidity(setErrors)){
-        console.log("my finish id" + getMyPlayingID());
-        turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
+      if(chipPlaced){
+        if(board.checkBoardValidity(setErrors)){
+          console.log("my finish id" + getMyPlayingID());
+          turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
+  
+          permanentChipsInHand = new Set<Chip>;
+          hand.chipsInHand.forEach(chip => {
+            permanentChipsInHand.add(chip);
+          });
+  
+          let newId = 0;
+          if(!(getMyPlayingID() == players.length - 1)){
+            newId = getMyPlayingID() + 1;
+          }
+  
+          setWhosTurn(`Сейчас ходит ${players[newId]}`);
+  
+          setMoveFlag(true);
+          setCanMove(false);
+  
+          if(hand.chipsInHand.size == 0){
+            setWhosTurn(`Вы победили!`);
+            alert("Вы победили!");
+          }
 
-        permanentHand.chipsInHand = new Set<Chip>;
-        hand.chipsInHand.forEach(chip => {
-          permanentHand.chipsInHand.add(chip);
-        });
-
-        let newId = 0;
-        if(!(getMyPlayingID() == players.length - 1)){
-          newId = getMyPlayingID() + 1;
-        }
-
-        setWhosTurn(`Сейчас ходит ${players[newId]}`);
-
-        setMoveFlag(true);
-        setCanMove(false);
-
-        if(hand.chipsInHand.size == 0){
-          setWhosTurn(`Вы победили!`);
-          alert("Вы победили!");
+          setErrors([]);
         }
       }
+      else{
+        setErrors(["Для завершения хода нужно", "выложить фишку из руки!"])
+      }
+      
     }
 
     if (flag) {
