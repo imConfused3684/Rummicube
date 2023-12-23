@@ -33,7 +33,7 @@ let backupBoard: Board;
 let backupHand: Hand;
 
 const sessionId = nanoid();
-let players: string[] = [];
+let players: any[][] = [];
 let permanentChipsInHand: Set<Chip> = new Set<Chip>;
 
 export default function SessionForm() {
@@ -57,7 +57,7 @@ export default function SessionForm() {
   }
 
   useEffect(() => {
-    players.push(uName!);
+    players.push([uName!, 14]);
     //restart();
     if (Boolean(Number(host))) {
       const time = queryParameters.get("time");
@@ -76,16 +76,22 @@ export default function SessionForm() {
       newBoard.cells = boardCells;
       setBoard(newBoard);
 
-      if(players[winnerId] == uName){
+      if(String(players[winnerId][0]) == uName){
         alert("Вы победили!");
       }
       else{
-        alert(`Игрок ${players[winnerId]} победил`);
-        setWhosTurn(`Игрок ${players[winnerId]} победил`);
+        alert(`Игрок ${players[winnerId][0]} победил`);
+        setWhosTurn(`Игрок ${players[winnerId][0]} победил`);
       }
     });
 
-    socket.on("newTurn", (newId, boardCells, chipSackChips) => {
+    socket.on("newTurn", (prevPhandSize, newId, boardCells, chipSackChips) => {
+
+
+      players[newId - 1 < 0 ? players.length - 1 : newId - 1][1] = prevPhandSize;
+      console.log("UPDATED: ");
+      console.log(players);
+
       setChipPlaced(false);
       let newBoard = new Board();
       //newBoard.cells = boardCells;
@@ -127,11 +133,11 @@ export default function SessionForm() {
       
 
       console.log(`newId: ${newId} turn`)
-      console.log(`its ${players[newId]} turn`);
+      console.log(`its ${players[newId][0]} turn`);
 
       
 
-      if(players[newId] == uName){
+      if(String(players[newId][0]) == uName){
         setCanMove(true);
 
         setWhosTurn(`Сейчас мой ход`);
@@ -155,7 +161,7 @@ export default function SessionForm() {
         }
       }
       else{
-        setWhosTurn(`Сейчас ходит ${players[newId]}`);
+        setWhosTurn(`Сейчас ходит ${players[newId][0]}`);
       }
         
       setChipSack(newChipSack);
@@ -179,7 +185,7 @@ export default function SessionForm() {
     socket.on("playerConnected", (newPlayer) => {
       //sendDataTonewPlayer(player);
       
-      players.push(newPlayer.name);
+      players.push([newPlayer.name, 14]);
 
 
       let s = `Новый игрок ${newPlayer.name} подключился`;
@@ -304,7 +310,7 @@ export default function SessionForm() {
     //console.log(players);
 
     for(let i = 0; i < players.length; i++){
-      if(String(players[i]).match(String(uName))){
+      if(String(players[i][0]).match(String(uName))){
         return i;
       }
     }
@@ -329,7 +335,7 @@ export default function SessionForm() {
         newId = getMyPlayingID() + 1;
       }
 
-      setWhosTurn(`Сейчас ходит ${players[newId]}`);
+      setWhosTurn(`Сейчас ходит ${players[newId][0]}`);
 
       setMoveFlag(true);
       setCanMove(false);
@@ -365,7 +371,7 @@ export default function SessionForm() {
             newId = getMyPlayingID() + 1;
           }
   
-          setWhosTurn(`Сейчас ходит ${players[newId]}`);
+          setWhosTurn(`Сейчас ходит ${players[newId][0]}`);
   
           setMoveFlag(true);
           setCanMove(false);
@@ -375,6 +381,7 @@ export default function SessionForm() {
             alert("Вы победили!");
           }
 
+          players[getMyPlayingID()][1] = hand.chipsInHand.size;
           setErrors([]);
         }
       }

@@ -40,7 +40,7 @@ class Game {
 
         console.log("newId: " + newId);
 
-        this.socket.to(this.getRoom(sessionId)).emit("newTurn", newId, boardCells, chipSackChips);
+        this.socket.to(this.getRoom(sessionId)).emit("newTurn", prevPhandSize, newId, boardCells, chipSackChips);
     }
 
     gameStartsNow(sessionId) {
