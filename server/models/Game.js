@@ -21,6 +21,12 @@ class Game {
         this.socket.once("gameStarts", (sessionId) => this.gameStartsNow(sessionId));
 
         this.socket.on("turnFinished", (sessionId, prevPId, prevPhandSize, boardCells, chipSackChips) => this.turnFinished(sessionId, prevPId, prevPhandSize, boardCells, chipSackChips));
+    
+        this.socket.on("iAmUpdatingBoard", (sessionId, boardcells) => this.someoneUpdatingBoard(sessionId, boardcells));
+    }
+
+    someoneUpdatingBoard(sessionId, boardcells) {
+        this.socket.to(this.getRoom(sessionId)).emit("someoneUpdatingBoard", boardcells);
     }
 
     turnFinished(sessionId, prevPId, prevPhandSize, boardCells, chipSackChips) {
@@ -40,7 +46,7 @@ class Game {
 
         console.log("newId: " + newId);
 
-        this.socket.to(this.getRoom(sessionId)).emit("newTurn", newId, boardCells, chipSackChips);
+        this.socket.to(this.getRoom(sessionId)).emit("newTurn", prevPhandSize, newId, boardCells, chipSackChips);
     }
 
     gameStartsNow(sessionId) {

@@ -1,3 +1,5 @@
+import { winsUpdate } from "../../common/service/userService";
+
 import RumButton from "../../common/el/rumButton";
 import InfoButton from "../../common/el/infoButton";
 import Timer from "../../common/el/timer";
@@ -18,7 +20,7 @@ import { Colors } from "../../common/el/models/colors";
 import { Cell } from "../../common/el/models/cell";
 import Logger from "../../common/el/logger";
 
-import { Player, socket, createNewGame, turnFinished } from "../../common/el/models/player";
+import { Player, socket, createNewGame, turnFinished, iAmUpdatingBoard } from "../../common/el/models/player";
 import { nanoid } from "nanoid";
 // const socket = io("http://localhost:6284/");
 //   socket.on("connect", () => {
@@ -33,10 +35,13 @@ let backupBoard: Board;
 let backupHand: Hand;
 
 const sessionId = nanoid();
-let players: string[] = [];
-let permanentHand: Hand = new Hand();
+let players: any[][] = [];
+let permanentChipsInHand: Set<Chip> = new Set<Chip>;
 
+let won: boolean = false;
 export default function SessionForm() {
+  const navigate = useNavigate();
+
   const queryParameters = new URLSearchParams(window.location.search);
   const uName = queryParameters.get("username");
   const wins = queryParameters.get("wins");
@@ -57,13 +62,11 @@ export default function SessionForm() {
   }
 
   useEffect(() => {
-    players.push(uName!);
+    players.push([uName!, 14]);
     //restart();
     if (Boolean(Number(host))) {
-      const time = queryParameters.get("time");
-      const pnum = queryParameters.get("pnum");
 
-      createNewGame(creator, Number(time), Number(pnum));
+      createNewGame(creator, Number(queryParameters.get("time")), Number(queryParameters.get("pnum")));
       setConditions(["Код сессии: " + sessionId + ". Ожидаем игроков", ...conditions]);
 
     } else {
@@ -71,20 +74,55 @@ export default function SessionForm() {
 
     }
 
+    socket.on("someoneUpdatingBoard", (boardCells) => {
+
+      let newBoard = new Board();
+      for (let i = 0; i < 8; i++) {
+        const row: Cell[] = []
+        for (let j = 0; j < 23; j++) {
+            // row.push(new Cell(this, j, i, null, j == 4 || j == 9))
+            if(boardCells[i][j].chip instanceof Object){
+              row.push(new Cell(
+                Number(boardCells[i][j].x), 
+                Number(boardCells[i][j].y), 
+                new Chip(boardCells[i][j].chip.id, boardCells[i][j].chip.color, boardCells[i][j].chip.value)
+                , Number(boardCells[i][j].id), 
+                boardCells[i][j].isDivider));
+            }
+            else{
+              row.push(new Cell(Number(boardCells[i][j].x), Number(boardCells[i][j].y), null, Number(boardCells[i][j].id), boardCells[i][j].isDivider));
+            }
+        }
+        newBoard.cells.push(row);
+      }
+      setBoard(newBoard);
+      setSelectedCell(null);
+
+    });
+
     socket.on("heWon", (winnerId, boardCells) => {
       let newBoard = new Board();
       newBoard.cells = boardCells;
       setBoard(newBoard);
 
-      if(players[winnerId] == uName){
+      if(String(players[winnerId][0]) == uName){
+        won = true;
         alert("Вы победили!");
       }
       else{
-        alert(`Игрок ${players[winnerId]} победил`);
+        alert(`Игрок ${players[winnerId][0]} победил`);
+        setWhosTurn(`Игрок ${players[winnerId][0]} победил`);
       }
     });
 
-    socket.on("newTurn", (newId, boardCells, chipSackChips) => {
+    socket.on("newTurn", (prevPhandSize, newId, boardCells, chipSackChips) => {
+
+
+      players[newId - 1 < 0 ? players.length - 1 : newId - 1][1] = prevPhandSize;
+      console.log("UPDATED: ");
+      console.log(players);
+
+      setChipPlaced(false);
       let newBoard = new Board();
       //newBoard.cells = boardCells;
 
@@ -107,10 +145,10 @@ export default function SessionForm() {
             }
         }
         newBoard.cells.push(row);
-    }
-    console.log(newBoard.cells);
-    setBoard(newBoard);
-    setSelectedCell(null);
+      }
+      console.log(newBoard.cells);
+      setBoard(newBoard);
+      setSelectedCell(null);
 
 
       //console.log(chipSackChips);
@@ -125,17 +163,17 @@ export default function SessionForm() {
       
 
       console.log(`newId: ${newId} turn`)
-      console.log(`its ${players[newId]} turn`);
+      console.log(`its ${players[newId][0]} turn`);
 
       
 
-      if(players[newId] == uName){
+      if(String(players[newId][0]) == uName){
         setCanMove(true);
 
         setWhosTurn(`Сейчас мой ход`);
 
-        console.log("ITS MY TURN. hand: " + hand.chipsInHand.size)
-        if(permanentHand.chipsInHand.size == 0){
+        console.log("ITS MY TURN. hand: " + permanentChipsInHand.size)
+        if(permanentChipsInHand.size == 0){
           console.log("hand init needed");
           
           
@@ -147,11 +185,13 @@ export default function SessionForm() {
           setHand(newHand);
         }
         else{
-          setHand(permanentHand);
+          let newHand = new Hand();
+          newHand.chipsInHand = permanentChipsInHand;
+          setHand(newHand);
         }
       }
       else{
-        setWhosTurn(`Сейчас ходит ${players[newId]}`);
+        setWhosTurn(`Сейчас ходит ${players[newId][0]}`);
       }
         
       setChipSack(newChipSack);
@@ -175,7 +215,7 @@ export default function SessionForm() {
     socket.on("playerConnected", (newPlayer) => {
       //sendDataTonewPlayer(player);
       
-      players.push(newPlayer.name);
+      players.push([newPlayer.name, 14]);
 
 
       let s = `Новый игрок ${newPlayer.name} подключился`;
@@ -202,13 +242,14 @@ export default function SessionForm() {
             setBoard(newBoard);
           }
 
-        });
+    });
     
   }, []);
 
   let firstMoveDone = false;
   //let [players, setPlayersList] = useState<Array<any>>([]);
   const [gameSatrted, setGameflag] = useState<boolean>(false);
+  const [chipPlaced, setChipPlaced] = useState<boolean>(false);
   // const [serverText, setServerText] = useState<string>("");
 
   const [canMove, setCanMove] = useState<boolean>(false);
@@ -255,6 +296,8 @@ export default function SessionForm() {
       } else {
         setSelectedCell(cell);
       }
+
+      iAmUpdatingBoard(creator.sessionId, board.cells);
     }
   }
 
@@ -286,11 +329,14 @@ export default function SessionForm() {
   
         setSelectedCell(null);
         setHand({ ...hand });
+        setChipPlaced(true);
 
         setMoveFlag(false);
       } else {
         console.log("aasdasds");
       }
+
+      iAmUpdatingBoard(creator.sessionId, board.cells);
     }
   }
 
@@ -298,7 +344,7 @@ export default function SessionForm() {
     //console.log(players);
 
     for(let i = 0; i < players.length; i++){
-      if(String(players[i]).match(String(uName))){
+      if(String(players[i][0]).match(String(uName))){
         return i;
       }
     }
@@ -313,9 +359,9 @@ export default function SessionForm() {
 
       turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
 
-      permanentHand.chipsInHand = new Set<Chip>;
+      permanentChipsInHand = new Set<Chip>;
         hand.chipsInHand.forEach(chip => {
-          permanentHand.chipsInHand.add(chip);
+          permanentChipsInHand.add(chip);
         });
 
       let newId = 0;
@@ -323,7 +369,7 @@ export default function SessionForm() {
         newId = getMyPlayingID() + 1;
       }
 
-      setWhosTurn(`Сейчас ходит ${players[newId]}`);
+      setWhosTurn(`Сейчас ходит ${players[newId][0]}`);
 
       setMoveFlag(true);
       setCanMove(false);
@@ -341,33 +387,45 @@ export default function SessionForm() {
       setBoard(backupBoard);
 
       setHand({ ...backupHand });
+
+      iAmUpdatingBoard(creator.sessionId ,backupBoard.cells);
     }
 
     function funcOk() {
-      if(board.checkBoardValidity(setErrors)){
-        console.log("my finish id" + getMyPlayingID());
-        turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
+      if(chipPlaced){
+        if(board.checkBoardValidity(setErrors)){
+          console.log("my finish id" + getMyPlayingID());
+          turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
+  
+          permanentChipsInHand = new Set<Chip>;
+          hand.chipsInHand.forEach(chip => {
+            permanentChipsInHand.add(chip);
+          });
+  
+          let newId = 0;
+          if(!(getMyPlayingID() == players.length - 1)){
+            newId = getMyPlayingID() + 1;
+          }
+  
+          setWhosTurn(`Сейчас ходит ${players[newId][0]}`);
+  
+          setMoveFlag(true);
+          setCanMove(false);
+  
+          if(hand.chipsInHand.size == 0){
+            won = true;
+            setWhosTurn(`Вы победили!`);
+            alert("Вы победили!");
+          }
 
-        permanentHand.chipsInHand = new Set<Chip>;
-        hand.chipsInHand.forEach(chip => {
-          permanentHand.chipsInHand.add(chip);
-        });
-
-        let newId = 0;
-        if(!(getMyPlayingID() == players.length - 1)){
-          newId = getMyPlayingID() + 1;
-        }
-
-        setWhosTurn(`Сейчас ходит ${players[newId]}`);
-
-        setMoveFlag(true);
-        setCanMove(false);
-
-        if(hand.chipsInHand.size == 0){
-          setWhosTurn(`Вы победили!`);
-          alert("Вы победили!");
+          players[getMyPlayingID()][1] = hand.chipsInHand.size;
+          setErrors([]);
         }
       }
+      else{
+        setErrors(["Для завершения хода нужно", "выложить фишку из руки!"])
+      }
+      
     }
 
     if (flag) {
@@ -477,6 +535,17 @@ export default function SessionForm() {
 
     setCanMove(true);
   }
+
+  async function exitFunc(){
+    console.log(won);
+    if(won){
+      await winsUpdate(uName!, Number(wins) + 1);
+      navigate(`/main/?username=${uName}&wins=${Number(wins) + 1}`);
+    }
+    else{
+      navigate(`/main/?username=${uName}&wins=${Number(wins)}`);
+    }
+  }
   
   const [whosTurn, setWhosTurn] = useState<string>("");
   return (
@@ -495,9 +564,10 @@ export default function SessionForm() {
           start={canstart && Boolean(Number(host))}
           func={() => startFunc()}
         />
-        <NavLink className="exitGameButtWrapper" to="/main">
-          <RumButton text={"Выход"} func={() => {}} />
-        </NavLink>
+        <div className="exitGameButtWrapper">
+          <RumButton text={"Выход"} func={exitFunc} />
+        </div>
+        
 
         <Logger errors={errors} />
 
