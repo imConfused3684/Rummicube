@@ -27,3 +27,7 @@ export function createNewGame(player: Player | undefined, time: number, pnum: nu
 export function turnFinished(sessionId: string | undefined, prevPid: number, prevPhandSize: number, boardCells: any[][], chips: any[]) {
     socket.emit("turnFinished", sessionId, prevPid, prevPhandSize, boardCells, chips);
 }
+
+export function iAmUpdatingBoard(sessionId: string | undefined, boardCells: any[][]) {
+    socket.emit("iAmUpdatingBoard", sessionId, boardCells);
+}

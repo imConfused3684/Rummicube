@@ -18,7 +18,7 @@ import { Colors } from "../../common/el/models/colors";
 import { Cell } from "../../common/el/models/cell";
 import Logger from "../../common/el/logger";
 
-import { Player, socket, createNewGame, turnFinished } from "../../common/el/models/player";
+import { Player, socket, createNewGame, turnFinished, iAmUpdatingBoard } from "../../common/el/models/player";
 import { nanoid } from "nanoid";
 // const socket = io("http://localhost:6284/");
 //   socket.on("connect", () => {
@@ -71,6 +71,32 @@ export default function SessionForm() {
 
     }
 
+    socket.on("someoneUpdatingBoard", (boardCells) => {
+
+      let newBoard = new Board();
+      for (let i = 0; i < 8; i++) {
+        const row: Cell[] = []
+        for (let j = 0; j < 23; j++) {
+            // row.push(new Cell(this, j, i, null, j == 4 || j == 9))
+            if(boardCells[i][j].chip instanceof Object){
+              row.push(new Cell(
+                Number(boardCells[i][j].x), 
+                Number(boardCells[i][j].y), 
+                new Chip(boardCells[i][j].chip.id, boardCells[i][j].chip.color, boardCells[i][j].chip.value)
+                , Number(boardCells[i][j].id), 
+                boardCells[i][j].isDivider));
+            }
+            else{
+              row.push(new Cell(Number(boardCells[i][j].x), Number(boardCells[i][j].y), null, Number(boardCells[i][j].id), boardCells[i][j].isDivider));
+            }
+        }
+        newBoard.cells.push(row);
+      }
+      setBoard(newBoard);
+      setSelectedCell(null);
+
+    });
+
     socket.on("heWon", (winnerId, boardCells) => {
       let newBoard = new Board();
       newBoard.cells = boardCells;
@@ -115,10 +141,10 @@ export default function SessionForm() {
             }
         }
         newBoard.cells.push(row);
-    }
-    console.log(newBoard.cells);
-    setBoard(newBoard);
-    setSelectedCell(null);
+      }
+      console.log(newBoard.cells);
+      setBoard(newBoard);
+      setSelectedCell(null);
 
 
       //console.log(chipSackChips);
@@ -212,7 +238,7 @@ export default function SessionForm() {
             setBoard(newBoard);
           }
 
-        });
+    });
     
   }, []);
 
@@ -266,6 +292,8 @@ export default function SessionForm() {
       } else {
         setSelectedCell(cell);
       }
+
+      iAmUpdatingBoard(creator.sessionId, board.cells);
     }
   }
 
@@ -303,6 +331,8 @@ export default function SessionForm() {
       } else {
         console.log("aasdasds");
       }
+
+      iAmUpdatingBoard(creator.sessionId, board.cells);
     }
   }
 
@@ -353,6 +383,8 @@ export default function SessionForm() {
       setBoard(backupBoard);
 
       setHand({ ...backupHand });
+
+      iAmUpdatingBoard(creator.sessionId ,backupBoard.cells);
     }
 
     function funcOk() {
