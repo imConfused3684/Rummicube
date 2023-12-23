@@ -2,6 +2,27 @@ import {firebase} from '../db.js';
 import User from '../models/user.js';
 const firestore = firebase.firestore();
 
+export const winsUpdate = async (req, res, next) => {
+    try {
+        const data = req.body;
+
+        // достаём док подходящих по условиям отношений
+        const querySnapshot = await firestore.collection('users')
+            .where('login', '==', data.uName)
+            .get();
+
+        // идём по доку и обновляем
+        querySnapshot.forEach(async (doc) => {
+            await doc.ref.update({ wins: data.newWins });
+        });
+
+        res.status(200).send('Wins updated successfully');
+    } catch (error) {
+        console.error('Error updating user wins:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
 export const addUser = async (req, res, next) => {
     try {
         const data = req.body;

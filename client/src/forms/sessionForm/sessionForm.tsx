@@ -1,3 +1,5 @@
+import { winsUpdate } from "../../common/service/userService";
+
 import RumButton from "../../common/el/rumButton";
 import InfoButton from "../../common/el/infoButton";
 import Timer from "../../common/el/timer";
@@ -36,7 +38,10 @@ const sessionId = nanoid();
 let players: any[][] = [];
 let permanentChipsInHand: Set<Chip> = new Set<Chip>;
 
+let won: boolean = false;
 export default function SessionForm() {
+  const navigate = useNavigate();
+
   const queryParameters = new URLSearchParams(window.location.search);
   const uName = queryParameters.get("username");
   const wins = queryParameters.get("wins");
@@ -60,10 +65,8 @@ export default function SessionForm() {
     players.push([uName!, 14]);
     //restart();
     if (Boolean(Number(host))) {
-      const time = queryParameters.get("time");
-      const pnum = queryParameters.get("pnum");
 
-      createNewGame(creator, Number(time), Number(pnum));
+      createNewGame(creator, Number(queryParameters.get("time")), Number(queryParameters.get("pnum")));
       setConditions(["Код сессии: " + sessionId + ". Ожидаем игроков", ...conditions]);
 
     } else {
@@ -103,6 +106,7 @@ export default function SessionForm() {
       setBoard(newBoard);
 
       if(String(players[winnerId][0]) == uName){
+        won = true;
         alert("Вы победили!");
       }
       else{
@@ -409,6 +413,7 @@ export default function SessionForm() {
           setCanMove(false);
   
           if(hand.chipsInHand.size == 0){
+            won = true;
             setWhosTurn(`Вы победили!`);
             alert("Вы победили!");
           }
@@ -530,6 +535,17 @@ export default function SessionForm() {
 
     setCanMove(true);
   }
+
+  async function exitFunc(){
+    console.log(won);
+    if(won){
+      await winsUpdate(uName!, Number(wins) + 1);
+      navigate(`/main/?username=${uName}&wins=${Number(wins) + 1}`);
+    }
+    else{
+      navigate(`/main/?username=${uName}&wins=${Number(wins)}`);
+    }
+  }
   
   const [whosTurn, setWhosTurn] = useState<string>("");
   return (
@@ -548,9 +564,10 @@ export default function SessionForm() {
           start={canstart && Boolean(Number(host))}
           func={() => startFunc()}
         />
-        <NavLink className="exitGameButtWrapper" to="/main">
-          <RumButton text={"Выход"} func={() => {}} />
-        </NavLink>
+        <div className="exitGameButtWrapper">
+          <RumButton text={"Выход"} func={exitFunc} />
+        </div>
+        
 
         <Logger errors={errors} />
 
