@@ -8,6 +8,7 @@ export default function FirstForm() {
   const queryParameters = new URLSearchParams(window.location.search);
   const uName = queryParameters.get("username");
   const wins = queryParameters.get("wins");
+  const exit = queryParameters.get("exit");
   const navigate = useNavigate();
 
   function func() {}
@@ -22,6 +23,10 @@ export default function FirstForm() {
     if (uName != null) {
       navigate(`/connection/?username=${uName}&wins=${Number(wins)}`);
     }
+  }
+
+  if (exit != null) {
+    alert(`Игрок ${exit} вышел, сесия была распущена`);
   }
 
   return (

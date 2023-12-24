@@ -23,6 +23,12 @@ class Game {
         this.socket.on("turnFinished", (sessionId, prevPId, prevPhandSize, boardCells, chipSackChips) => this.turnFinished(sessionId, prevPId, prevPhandSize, boardCells, chipSackChips));
     
         this.socket.on("iAmUpdatingBoard", (sessionId, boardcells) => this.someoneUpdatingBoard(sessionId, boardcells));
+
+        this.socket.on("imOut", (sessionId, idiotId) => this.someoneOut(sessionId, idiotId));
+    }
+
+    someoneOut(sessionId, idiotId) {
+        this.socket.to(this.getRoom(sessionId)).emit("someoneOut", idiotId);
     }
 
     someoneUpdatingBoard(sessionId, boardcells) {
