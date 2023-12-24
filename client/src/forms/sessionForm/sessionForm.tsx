@@ -10,7 +10,7 @@ import { Hand } from "../../common/el/models/hand";
 import { Chip } from "../../common/el/models/chip";
 
 import "./sessionForm.css";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import HandComponent from "../../common/el/handComponent";
@@ -39,6 +39,8 @@ let players: any[][] = [];
 let permanentChipsInHand: Set<Chip> = new Set<Chip>;
 
 let won: boolean = false;
+let gameEnded = false;
+let firstMoveDone = false;
 export default function SessionForm() {
   const navigate = useNavigate();
 
@@ -73,6 +75,10 @@ export default function SessionForm() {
       setConditions(["Вы успешно подключились. Ожидаем игроков", ...conditions]);
 
     }
+
+    socket.on("someoneOut", (hisId)=>{
+      navigate(`/main/?username=${uName}&wins=${Number(wins)}&exit=${players[hisId][0]}`);
+    });
 
     socket.on("someoneUpdatingBoard", (boardCells) => {
 
@@ -113,6 +119,7 @@ export default function SessionForm() {
         alert(`Игрок ${players[winnerId][0]} победил`);
         setWhosTurn(`Игрок ${players[winnerId][0]} победил`);
       }
+      gameEnded = true;
     });
 
     socket.on("newTurn", (prevPhandSize, newId, boardCells, chipSackChips) => {
@@ -246,7 +253,7 @@ export default function SessionForm() {
     
   }, []);
 
-  let firstMoveDone = false;
+  
   //let [players, setPlayersList] = useState<Array<any>>([]);
   const [gameSatrted, setGameflag] = useState<boolean>(false);
   const [chipPlaced, setChipPlaced] = useState<boolean>(false);
@@ -540,12 +547,19 @@ export default function SessionForm() {
 
   async function exitFunc(){
     console.log(won);
-    if(won){
+    if(won && gameEnded){
       await winsUpdate(uName!, Number(wins) + 1);
       navigate(`/main/?username=${uName}&wins=${Number(wins) + 1}`);
+    }else if(gameEnded == true){
+      navigate(`/main/?username=${uName}&wins=${Number(wins)}`);
     }
     else{
-      navigate(`/main/?username=${uName}&wins=${Number(wins)}`);
+      socket.emit("imOut", creator.sessionId, getMyPlayingID())
+      if(Number(wins) > 0){
+        await winsUpdate(uName!, Number(wins) - 1);
+      }
+      alert("Зафиксированно досрочное покидание сессии, ваш счётчик побед будет уменьшен");
+      navigate(`/main/?username=${uName}&wins=${Number(wins) - 1}`);
     }
   }
   
