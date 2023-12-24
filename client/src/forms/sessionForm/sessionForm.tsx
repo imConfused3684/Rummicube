@@ -208,7 +208,7 @@ export default function SessionForm() {
         //setPlayersList(players);
 
         console.log(players);
-        
+        setWhosTurn(`Сейчас ходит ${players[0][0]}`)
       });
     }
 
@@ -534,6 +534,8 @@ export default function SessionForm() {
     restart();
 
     setCanMove(true);
+
+    setWhosTurn(`Сейчас мой ход`);
   }
 
   async function exitFunc(){
