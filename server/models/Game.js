@@ -16,7 +16,7 @@ class Game {
 
         this.socket.on("playerConnects", (player) => this.onPlayerConnects(player));
 
-        this.socket.once("whoIsIN", (sessionId, players) => this.onwhoIsIN(sessionId, players));
+        this.socket.once("whoIsIN", (sessionId, players, time) => this.onwhoIsIN(sessionId, players, time));
 
         this.socket.once("gameStarts", (sessionId) => this.gameStartsNow(sessionId));
 
@@ -60,9 +60,9 @@ class Game {
         this.socket.to(this.getRoom(sessionId)).emit("gameStartsNow");
     }
 
-    onwhoIsIN(sessionId, players) {
+    onwhoIsIN(sessionId, players, time) {
         console.log("onwhoIsIN " + sessionId);
-        this.socket.to(this.getRoom(sessionId)).emit("passingPlayersList", players);
+        this.socket.to(this.getRoom(sessionId)).emit("passingPlayersList", players, time);
     }
 
     onCreateNewGame(player, time, pnum) {

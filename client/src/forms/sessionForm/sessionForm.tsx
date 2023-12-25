@@ -2,7 +2,7 @@ import { winsUpdate } from "../../common/service/userService";
 
 import RumButton from "../../common/el/rumButton";
 import InfoButton from "../../common/el/infoButton";
-import Timer from "../../common/el/timer";
+import TimerCompomemt from "../../common/el/timerComponent";
 
 import { Board } from "../../common/el/models/board";
 import { ChipSack } from "../../common/el/models/chipSack";
@@ -22,6 +22,11 @@ import Logger from "../../common/el/logger";
 
 import { Player, socket, createNewGame, turnFinished, iAmUpdatingBoard } from "../../common/el/models/player";
 import { nanoid } from "nanoid";
+
+
+let duration: number = 180;
+let intervalId: any;
+let remainingTime: number;
 // const socket = io("http://localhost:6284/");
 //   socket.on("connect", () => {
 //     console.log(socket.id);
@@ -42,6 +47,27 @@ let won: boolean = false;
 let gameEnded = false;
 let firstMoveDone = false;
 export default function SessionForm() {
+  function start() {
+    remainingTime = duration + 1;
+
+    intervalId = setInterval(() => {
+      remainingTime -= 1;
+      setCurrentTime(remainingTime);
+
+
+      if (remainingTime <= 0) {
+        stop();
+      }
+    }, 1000);
+  }
+
+  function stop() {
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+  }
+
   const navigate = useNavigate();
 
   const queryParameters = new URLSearchParams(window.location.search);
@@ -123,7 +149,7 @@ export default function SessionForm() {
     });
 
     socket.on("newTurn", (prevPhandSize, newId, boardCells, chipSackChips) => {
-
+      stop();
 
       players[newId - 1 < 0 ? players.length - 1 : newId - 1][1] = prevPhandSize;
       console.log("UPDATED: ");
@@ -196,12 +222,14 @@ export default function SessionForm() {
           newHand.chipsInHand = permanentChipsInHand;
           setHand(newHand);
         }
+
+        
       }
       else{
         setWhosTurn(`Сейчас ходит ${players[newId][0]}`);
       }
-        
       setChipSack(newChipSack);
+      start();
     });
 
     socket.on("uCanStart", ()=>{
@@ -209,7 +237,8 @@ export default function SessionForm() {
     });
 
     if(!Boolean(Number(host))){
-      socket.on("passingPlayersList", (newPlayers) => {
+      socket.on("passingPlayersList", (newPlayers, timerTime) => {
+        duration = timerTime;
         console.log(newPlayers);
         players = newPlayers;
         //setPlayersList(players);
@@ -358,6 +387,18 @@ export default function SessionForm() {
     return -1;
   }
 
+  function funcNo() {
+    setErrors([]);
+
+    setMoveFlag(true);
+
+    setBoard(backupBoard);
+
+    setHand({ ...backupHand });
+
+    iAmUpdatingBoard(creator.sessionId ,backupBoard.cells);
+  }
+
   function funcS(flag: boolean) {
     if(flag){
       // initHand();
@@ -365,6 +406,7 @@ export default function SessionForm() {
       setHand({ ...hand }); // Обновите состояние руки
 
       turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
+      stop();
 
       permanentChipsInHand = new Set<Chip>;
         hand.chipsInHand.forEach(chip => {
@@ -380,30 +422,20 @@ export default function SessionForm() {
 
       setMoveFlag(true);
       setCanMove(false);
+
+      start();
     }
   }
 
-  function MoveOrSack({ flag }: FlagProp) {
-    
-
-    function funcNo() {
-      setErrors([]);
-
-      setMoveFlag(true);
-
-      setBoard(backupBoard);
-
-      setHand({ ...backupHand });
-
-      iAmUpdatingBoard(creator.sessionId ,backupBoard.cells);
-    }
+  function MoveOrSack({ flag }: FlagProp) {    
 
     function funcOk() {
       if(chipPlaced){
         if(board.checkBoardValidity(setErrors)){
           console.log("my finish id" + getMyPlayingID());
           turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
-  
+          stop();
+
           permanentChipsInHand = new Set<Chip>;
           hand.chipsInHand.forEach(chip => {
             permanentChipsInHand.add(chip);
@@ -427,6 +459,7 @@ export default function SessionForm() {
 
           players[getMyPlayingID()][1] = hand.chipsInHand.size;
           setErrors([]);
+          start();
         }
       }
       else{
@@ -469,7 +502,6 @@ export default function SessionForm() {
     hand.chipsInHand = new Set(setArray);
     setHand({ ...hand });
   }
-  function timeIsUp() {}
 
   const [board, setBoard] = useState(new Board());
   const [chipSack, setChipSack] = useState(new ChipSack());
@@ -529,12 +561,13 @@ export default function SessionForm() {
 
   const [canstart, setcanstart] = useState<boolean>(false);
   function startFunc(){
+    duration = time;
     //console.log(sessionId);
     socket.emit("gameStarts", sessionId);
 
     console.log(players);
     console.log(creator.sessionId);
-    socket.emit("whoIsIN", creator.sessionId, players);
+    socket.emit("whoIsIN", creator.sessionId, players, time);
 
     setGameflag(true);
 
@@ -543,6 +576,8 @@ export default function SessionForm() {
     setCanMove(true);
 
     setWhosTurn(`Сейчас мой ход`);
+
+    start();
   }
 
   async function exitFunc(){
@@ -562,7 +597,55 @@ export default function SessionForm() {
       navigate(`/main/?username=${uName}&wins=${Number(wins) - 1}`);
     }
   }
+
+  function timerIsOver(){
+    if(canMove && remainingTime <= 0){
+      if(!moveFlag){
+        funcNo();
+        getRandomChipToHand(chipSack, backupHand);
+        setHand(backupHand);
+        permanentChipsInHand = backupHand.chipsInHand;
+        turnFinished(creator.sessionId, getMyPlayingID(), backupHand.chipsInHand.size, backupBoard.cells, Array.from(chipSack.chips));
+      }
+      else{
+        getRandomChipToHand(chipSack, hand);
+        setHand({ ...hand });
+        permanentChipsInHand = hand.chipsInHand;
+        backupHand = hand;
+        turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
+      }
+      stop();
   
+  
+      let newId = 0;
+      if(!(getMyPlayingID() == players.length - 1)){
+        newId = getMyPlayingID() + 1;
+      }
+  
+      setWhosTurn(`Сейчас ходит ${players[newId][0]}`);
+  
+      setMoveFlag(true);
+      setCanMove(false);
+
+      
+  
+      players[getMyPlayingID()][1] = hand.chipsInHand.size;
+      setErrors([]);
+      alert("Время на ход вышло.\nХод передан следующему игроку");
+      start();
+    }
+
+    if(remainingTime <= 0){
+      console.log("TIMER " + canMove);
+    }
+
+    console.log("time: " + remainingTime);
+  }
+  
+  
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  useEffect(() => {timerIsOver()}, [currentTime]);
+
   const [whosTurn, setWhosTurn] = useState<string>("");
   return (
     <div className="card">
@@ -594,7 +677,7 @@ export default function SessionForm() {
 
         <MoveOrSack flag={moveFlag} />
 
-        <Timer time={time} func={timeIsUp} />
+        <TimerCompomemt time={currentTime} />
 
       </div>
       <HandComponent hand={hand} handClick={handClick} />
