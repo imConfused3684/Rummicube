@@ -422,6 +422,8 @@ export default function SessionForm() {
 
       setMoveFlag(true);
       setCanMove(false);
+
+      start();
     }
   }
 
@@ -457,6 +459,7 @@ export default function SessionForm() {
 
           players[getMyPlayingID()][1] = hand.chipsInHand.size;
           setErrors([]);
+          start();
         }
       }
       else{
