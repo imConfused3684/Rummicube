@@ -1,7 +1,6 @@
-const firebase = require('firebase/compat/app');
-require('firebase/compat/firestore');
-const config = require('./config');
+import firebaseMain from 'firebase/compat/app';
+//require('firebase/compat/firestore');
+import "firebase/compat/firestore";
+import config from "./config.js";
 
-const db = firebase.initializeApp(config.firebaseConfig);
-
-module.exports = db;
+export const firebase = firebaseMain.initializeApp(config.firebaseConfig);

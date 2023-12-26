@@ -1,5 +1,18 @@
 const server = "http://localhost:6284";
 
+export async function winsUpdate(uName: string, wins: number) {
+    fetch(`${server}/api/user/winsUpdate`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            uName: `${uName}`,
+            newWins: `${wins}`
+        })
+    });
+}
+
 export async function register(uName: string, passW: string) {
     fetch(`${server}/api/user/register`, {
         method: "POST",

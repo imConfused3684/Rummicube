@@ -2,14 +2,16 @@ import Header from "../../common/el/header";
 import RumButton from "../../common/el/rumButton";
 import InfoButton from "../../common/el/infoButton";
 import "./firstForm.css";
-import { NavLink } from "react-router-dom";
-// import { BrowserRouter as Router, Link, Route, useHistory } from 'react-router-dom';
+
 import DevInformationComponent from "../../common/el/devInformationComponent";
+import { NavLink, Navigate, useNavigate } from "react-router-dom";
 
 export default function FirstForm() {
   const queryParameters = new URLSearchParams(window.location.search);
   const uName = queryParameters.get("username");
   const wins = queryParameters.get("wins");
+  const exit = queryParameters.get("exit");
+  const navigate = useNavigate();
 
   function func() {}
 
@@ -22,6 +24,21 @@ export default function FirstForm() {
 
   const showSystemInfo = () => {
     window.open('/system-info', '_blank');
+
+  function goToRoomCustomizationForm() {
+    if (uName != null) {
+      navigate(`/room-customization/?username=${uName}&wins=${Number(wins)}`);
+    }
+  }
+
+  function goToConnectionForm() {
+    if (uName != null) {
+      navigate(`/connection/?username=${uName}&wins=${Number(wins)}`);
+    }
+  }
+
+  if (exit != null) {
+    alert(`Игрок ${exit} вышел, сесия была распущена`);
   }
 
   return (
@@ -31,13 +48,9 @@ export default function FirstForm() {
 
         <h1 id="rummyTitle">Руммикуб</h1>
 
-        <NavLink to="/room-customization">
-          <RumButton text="Создать игру" func={func} />
-        </NavLink>
+        <RumButton text="Создать игру" func={goToRoomCustomizationForm} />
 
-        <NavLink to="/connection">
-          <RumButton text="Подключиться к игре" func={func} />
-        </NavLink>
+        <RumButton text="Подключиться к игре" func={goToConnectionForm} />
 
         <DevInformationComponent />
 

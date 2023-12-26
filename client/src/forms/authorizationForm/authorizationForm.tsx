@@ -22,10 +22,12 @@ export default function authorizationForm() {
     }
   }
 
+  
+
   return (
     <div className="card">
-      <Input bigText="Введите логин:" lilText="" onChange={setUsername}/>
-      <Input bigText="Введите пароль:" lilText="" onChange={setPassword}/>
+      <Input bigText="Введите логин:" lilText="" onChange={setUsername} isPassword={false}/>
+      <Input bigText="Введите пароль:" lilText="" onChange={setPassword} isPassword={true}/>
       
       <RumButton text={"Войти"} func={func} />
 

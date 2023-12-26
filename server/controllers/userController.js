@@ -1,10 +1,29 @@
-'use strict';
-
-const firebase = require('../db');
-const User = require('../models/user');
+import {firebase} from '../db.js';
+import User from '../models/user.js';
 const firestore = firebase.firestore();
 
-const addUser = async (req, res, next) => {
+export const winsUpdate = async (req, res, next) => {
+    try {
+        const data = req.body;
+
+        // достаём док подходящих по условиям отношений
+        const querySnapshot = await firestore.collection('users')
+            .where('login', '==', data.uName)
+            .get();
+
+        // идём по доку и обновляем
+        querySnapshot.forEach(async (doc) => {
+            await doc.ref.update({ wins: data.newWins });
+        });
+
+        res.status(200).send('Wins updated successfully');
+    } catch (error) {
+        console.error('Error updating user wins:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+export const addUser = async (req, res, next) => {
     try {
         const data = req.body;
 
@@ -28,7 +47,7 @@ const addUser = async (req, res, next) => {
     }
 }
 
-const getUserWins = async (req, res, next) => {
+export const getUserWins = async (req, res, next) => {
     try {
         const data = req.body;
         let wins = null;
@@ -54,7 +73,7 @@ const getUserWins = async (req, res, next) => {
     }
 }
 
-const getUserCount = async (req, res, next) => {
+export const getUserCount = async (req, res, next) => {
     try {
         const data = req.body;
 
@@ -70,9 +89,3 @@ const getUserCount = async (req, res, next) => {
         res.status(500).send('Internal Server Error');
     }
 }
-
-module.exports = {
-    addUser,
-    getUserWins,
-    getUserCount
-};
