@@ -146,6 +146,9 @@ export default function SessionForm() {
         setWhosTurn(`Игрок ${players[winnerId][0]} победил`);
       }
       gameEnded = true;
+
+      players[winnerId][1] = 0;
+      setPIfunc();
     });
 
     socket.on("newTurn", (prevPhandSize, newId, boardCells, chipSackChips) => {
@@ -230,6 +233,7 @@ export default function SessionForm() {
       }
       setChipSack(newChipSack);
       start();
+      setPIfunc();
     });
 
     socket.on("uCanStart", ()=>{
@@ -245,6 +249,7 @@ export default function SessionForm() {
 
         console.log(players);
         setWhosTurn(`Сейчас ходит ${players[0][0]}`)
+        setPIfunc();
       });
     }
 
@@ -256,6 +261,7 @@ export default function SessionForm() {
 
       let s = `Новый игрок ${newPlayer.name} подключился`;
       setConditions([s, ...conditions]);
+      setPIfunc();
     });
     
     socket.once("gameStartsNow", () => {
@@ -424,6 +430,8 @@ export default function SessionForm() {
       setCanMove(false);
 
       start();
+      players[getMyPlayingID()][1] = hand.chipsInHand.size;
+      setPIfunc();
     }
   }
 
@@ -458,6 +466,7 @@ export default function SessionForm() {
           }
 
           players[getMyPlayingID()][1] = hand.chipsInHand.size;
+          setPIfunc();
           setErrors([]);
           start();
         }
@@ -576,8 +585,10 @@ export default function SessionForm() {
     setCanMove(true);
 
     setWhosTurn(`Сейчас мой ход`);
+    setPIfunc();
 
     start();
+    setPIfunc();
   }
 
   async function exitFunc(){
@@ -600,7 +611,9 @@ export default function SessionForm() {
 
   function timerIsOver(){
     if(canMove && remainingTime <= 0){
+      
       if(!moveFlag){
+        players[getMyPlayingID()][1] = backupHand.chipsInHand.size + 1;
         funcNo();
         getRandomChipToHand(chipSack, backupHand);
         setHand(backupHand);
@@ -608,6 +621,7 @@ export default function SessionForm() {
         turnFinished(creator.sessionId, getMyPlayingID(), backupHand.chipsInHand.size, backupBoard.cells, Array.from(chipSack.chips));
       }
       else{
+        players[getMyPlayingID()][1] = hand.chipsInHand.size + 1;
         getRandomChipToHand(chipSack, hand);
         setHand({ ...hand });
         permanentChipsInHand = hand.chipsInHand;
@@ -629,10 +643,11 @@ export default function SessionForm() {
 
       
   
-      players[getMyPlayingID()][1] = hand.chipsInHand.size;
+      
       setErrors([]);
       alert("Время на ход вышло.\nХод передан следующему игроку");
       start();
+      setPIfunc();
     }
 
     if(remainingTime <= 0){
@@ -647,6 +662,17 @@ export default function SessionForm() {
   useEffect(() => {timerIsOver()}, [currentTime]);
 
   const [whosTurn, setWhosTurn] = useState<string>("");
+
+  const [playersInfo, setPlayersInfo] = useState<string[]>([]);
+
+  function setPIfunc(){
+    let aP: string[] = [];
+    players.forEach(player => {
+      aP.push(`${player[0]} - ${player[1]}`);
+    });
+    setPlayersInfo(aP);
+  }
+
   return (
     <div className="card">
       <div className="playing-table">
@@ -667,8 +693,10 @@ export default function SessionForm() {
           <RumButton text={"Выход"} func={exitFunc} />
         </div>
         
+        <Logger errors={playersInfo} top={true}/>
+        
 
-        <Logger errors={errors} />
+        <Logger errors={errors} top={false}/>
 
         <div className="sortButts">
           <InfoButton content="789" func={func789} />

@@ -2,16 +2,27 @@ import "../styles/logger.css";
 
 interface LoggerProps {
   errors: string[];
+  top: boolean;
 }
 
-export default function Logger({ errors }: LoggerProps) {
+export default function Logger({ errors, top }: LoggerProps) {
  
-
-  return (
-    <div className="logger">
-      {errors.map((error, index) => (
-        <p key={index}>{error}</p>
-      ))}
-    </div>
-  );
-}
+  if(top){
+    return (
+      <div className="logger2">
+        {errors.map((error, index) => (
+          <p key={index}>{error}</p>
+        ))}
+      </div>
+    );
+  }
+  else{
+    return (
+      <div className="logger1">
+        {errors.map((error, index) => (
+          <p key={index}>{error}</p>
+        ))}
+      </div>
+    );
+  }
+  }
