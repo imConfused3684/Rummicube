@@ -2,6 +2,8 @@ import Header from "../../common/el/header";
 import RumButton from "../../common/el/rumButton";
 import InfoButton from "../../common/el/infoButton";
 import "./firstForm.css";
+
+import DevInformationComponent from "../../common/el/devInformationComponent";
 import { NavLink, Navigate, useNavigate } from "react-router-dom";
 
 export default function FirstForm() {
@@ -12,6 +14,16 @@ export default function FirstForm() {
   const navigate = useNavigate();
 
   function func() {}
+
+  function showDevInformation() {
+    const devInfo = document.querySelector('.dev-info') as HTMLElement;
+    if (devInfo != null) {
+      devInfo.style.display = "flex";
+    }
+  }
+
+  const showSystemInfo = () => {
+    window.open('/system-info', '_blank');
 
   function goToRoomCustomizationForm() {
     if (uName != null) {
@@ -40,10 +52,12 @@ export default function FirstForm() {
 
         <RumButton text="Подключиться к игре" func={goToConnectionForm} />
 
-        <div className="bottom-panel">
-          <InfoButton content="i" func={func} />
+        <DevInformationComponent />
 
-          <InfoButton content="?" func={func} />
+        <div className="bottom-panel">
+          <InfoButton content="i" func={showSystemInfo} />
+
+          <InfoButton content="?" func={showDevInformation} />
         </div>
       </div>
     </>
