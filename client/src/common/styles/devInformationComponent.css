@@ -19,8 +19,8 @@
 
 .close-form {
     position: absolute;
-    top: 2%;
-    right: 2%;
+    top: 30px;
+    right: 30px;
     background: transparent url(../../assets/cross-icon.svg) center no-repeat;
     width: 15px;
     height: 15px;

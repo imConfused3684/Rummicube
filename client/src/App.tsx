@@ -5,7 +5,7 @@ import RegistrationForm from "./forms/registrationForm/registrationForm.tsx";
 import ConnectionForm from "./forms/connectionForm/connectionForm.tsx";
 import RoomCustomizationForm from "./forms/roomCustomizationForm/roomCustomizationForm.tsx";
 import SessionForm from "./forms/sessionForm/sessionForm.tsx"
-import DevInformationForm from "./forms/systemInformationForm/systemInformationForm.tsx";
+import SystemInformationForm from "./forms/systemInformationForm/systemInformationForm.tsx";
 import { Route, Routes } from "react-router-dom";
 
 
@@ -19,7 +19,7 @@ export default function App() {
       <Route path="/connection" element={<ConnectionForm />} />
       <Route path="/room-customization" element={<RoomCustomizationForm />} />
       <Route path="/game" element={<SessionForm />} />
-      <Route path="/developers-info" element={<DevInformationForm />} />
+      <Route path="/system-info" element={<SystemInformationForm />} />
     </Routes>
   );
 }

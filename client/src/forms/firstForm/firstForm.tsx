@@ -3,6 +3,7 @@ import RumButton from "../../common/el/rumButton";
 import InfoButton from "../../common/el/infoButton";
 import "./firstForm.css";
 import { NavLink } from "react-router-dom";
+// import { BrowserRouter as Router, Link, Route, useHistory } from 'react-router-dom';
 import DevInformationComponent from "../../common/el/devInformationComponent";
 
 export default function FirstForm() {
@@ -17,6 +18,10 @@ export default function FirstForm() {
     if (devInfo != null) {
       devInfo.style.display = "flex";
     }
+  }
+
+  const showSystemInfo = () => {
+    window.open('/system-info', '_blank');
   }
 
   return (
@@ -37,7 +42,7 @@ export default function FirstForm() {
         <DevInformationComponent />
 
         <div className="bottom-panel">
-          <InfoButton content="i" func={func} />
+          <InfoButton content="i" func={showSystemInfo} />
 
           <InfoButton content="?" func={showDevInformation} />
         </div>
