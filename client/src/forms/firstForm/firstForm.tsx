@@ -24,6 +24,7 @@ export default function FirstForm() {
 
   const showSystemInfo = () => {
     window.open('/system-info', '_blank');
+  }
 
   function goToRoomCustomizationForm() {
     if (uName != null) {
