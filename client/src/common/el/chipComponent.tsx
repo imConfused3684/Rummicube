@@ -10,9 +10,9 @@ export default function ChipComponent({ chip }: ChipProps) {
   let chipValue;
   if (chip.value === 0) {
     if (chip.color === Colors.BLACK) {
-      chipValue = <img src="./src/assets/joker-black.png" />;
+      chipValue = <img src="../src/assets/joker-black.png" />;
     } else {
-      chipValue = <img src="./src/assets/joker-red.png" />;
+      chipValue = <img src="../src/assets/joker-red.png" />;
     }
   } else {
     chipValue = chip.value;
