@@ -22,7 +22,7 @@ p {
 h1.info,
 h2.info,
 h3.info {
-    color: var(--title-color) !important;
+    color: var(--white) !important;
 }
 
 h1.info {
@@ -47,9 +47,27 @@ a:hover {
     text-decoration: underline;
 }
 
-.sys-info-img {
+.sys-info-img,
+.sys-info-img-wide,
+.sys-info-img-small,
+.sys-info-img-auto {
     border: 2px solid var(--white);
     border-radius: var(--border-radius);
     margin: 20px auto;
-    width: 70%;
+}
+
+.sys-info-img {
+    width: 60%;
+}
+
+.sys-info-img-wide {
+    width: 100%;
+}
+
+.sys-info-img-small {
+    width: 40%;
+}
+
+.sys-info-img-auto {
+    width: auto;
 }
