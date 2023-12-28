@@ -17,6 +17,10 @@
     border: 2px solid var(--white);
 }
 
+.dev-info h1 {
+    color: var(--white);
+    line-height: normal;
+}
 
 .close-form {
     position: absolute;
