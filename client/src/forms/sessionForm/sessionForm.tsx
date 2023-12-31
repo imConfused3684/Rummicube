@@ -102,6 +102,16 @@ export default function SessionForm() {
 
     }
 
+    socket.on("someoneTryedToCheck", (hisId, hisErrors)=>{
+      let newErrors: string[] = [`Игрок ${players[hisId][0]} попытался`, "подтвердить правильность хода:", ""]
+
+      hisErrors.forEach((err: any) => {
+        newErrors.push(String(err));
+      });
+
+      setErrors(newErrors);
+    });
+
     socket.on("someoneOut", (hisId)=>{
       navigate(`/main/?username=${uName}&wins=${Number(wins)}&exit=${players[hisId][0]}`);
     });
@@ -234,6 +244,7 @@ export default function SessionForm() {
       setChipSack(newChipSack);
       start();
       setPIfunc();
+      setErrors([]);
     });
 
     socket.on("uCanStart", ()=>{
@@ -445,15 +456,18 @@ export default function SessionForm() {
   function MoveOrSack({ flag }: FlagProp) {    
 
     function funcOk() {
+      let newErrors: string[] = [];
       if(chipPlaced){
-        if(board.checkBoardValidity(setErrors)){
+        const {checkFlag, outputErrors} = board.checkBoardValidity();
+        if(checkFlag){
           if(!firstMoveDone){
             let desc = board.checkFirstMove(backupBoard.cells);
             if(desc >= 30){
               firstMoveDone = true;
             }
             else{
-              setErrors(["Не выполнено правило первого хода!", "Из руки выложенно фишек на:", `${desc} очков`]);
+              newErrors = ["Не выполнено правило первого хода!", "Из руки выложенно фишек на:", `${desc} очков`];
+              //setErrors(["Не выполнено правило первого хода!", "Из руки выложенно фишек на:", `${desc} очков`]);
             }
           }
 
@@ -489,13 +503,17 @@ export default function SessionForm() {
             start();
           }
         }
+        else{
+          newErrors = outputErrors;
+        }
       }
       else{
-        setErrors(["Для завершения хода нужно", "выложить фишку из руки!"]);
+        newErrors = ["Для завершения хода нужно", "выложить фишку из руки!"];
+        //setErrors(["Для завершения хода нужно", "выложить фишку из руки!"]);
       }
-
-      if(errors.length > 0){
-        socket.emit("iTryedToCheck", creator.sessionId, getMyPlayingID(), errors);
+      setErrors(newErrors);
+      if(newErrors.length > 0){
+        socket.emit("iTryedToCheck", creator.sessionId, getMyPlayingID(), newErrors);
       }
       
     }

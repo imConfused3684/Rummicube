@@ -25,6 +25,12 @@ class Game {
         this.socket.on("iAmUpdatingBoard", (sessionId, boardcells) => this.someoneUpdatingBoard(sessionId, boardcells));
 
         this.socket.on("imOut", (sessionId, idiotId) => this.someoneOut(sessionId, idiotId));
+
+        this.socket.on("iTryedToCheck", (sessionId, playerId, playerErrors) => this.someoneTryedToCheck(sessionId, playerId, playerErrors));
+    }
+
+    someoneTryedToCheck(sessionId, playerId, playerErrors) {
+        this.socket.to(this.getRoom(sessionId)).emit("someoneTryedToCheck", playerId, playerErrors);
     }
 
     someoneOut(sessionId, idiotId) {
