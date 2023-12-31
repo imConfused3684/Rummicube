@@ -30,9 +30,87 @@ export class Board {
         this.cells[x][y].chip = chip;
     }
 
-    public checkBoardValidity(setError: (s:string[]) => void): boolean {
+    private countBoardValue(cellsToCount: Cell[][]): number{
+        let num: number = 0;
+
+        for(let i = 0; i < 8; i++){
+            for(let j = 0; j < 23; j++){
+                if(cellsToCount[i][j].chip){
+                    if(cellsToCount[i][j].chip!.value == 0){
+                        if(0 < j && j < 8){
+                            if(!cellsToCount[i][j - 1].chip && cellsToCount[i][j + 1].chip?.value == 0){
+                                num += cellsToCount[i][j + 2].chip?.value;
+                            }
+                            else if(!cellsToCount[i][j + 1].chip && cellsToCount[i][j - 1].chip?.value == 0){
+                                num += cellsToCount[i][j - 2].chip?.value;
+                            }
+                            else{
+                                num += Number(cellsToCount[i][j - 1].chip?.value) > Number(cellsToCount[i][j + 1].chip?.value) ? Number(cellsToCount[i][j - 1].chip?.value) : Number(cellsToCount[i][j + 1].chip?.value);
+                            }
+                        }
+                        else if(9 < j && j < 23){
+                            if(!cellsToCount[i][j - 1].chip && cellsToCount[i][j + 1].chip?.value == 0){
+                                num += cellsToCount[i][j + 2].chip?.value - 2;
+                            }
+                            else if(!cellsToCount[i][j + 1].chip && cellsToCount[i][j - 1].chip?.value == 0){
+                                num += cellsToCount[i][j - 2].chip?.value + 2;
+                            }
+                            else if(cellsToCount[i][j - 1].chip?.value == 0){
+                                num += cellsToCount[i][j + 1].chip?.value - 1;
+                            }
+                            else if(cellsToCount[i][j + 1].chip?.value == 0){
+                                num += cellsToCount[i][j - 1].chip?.value + 1;
+                            }
+                            else if(cellsToCount[i][j - 1].chip){
+                                num += cellsToCount[i][j - 1].chip?.value + 1;
+                            }
+                            else{
+                                num += cellsToCount[i][j + 1].chip?.value - 1;
+                            }
+                        }
+                        else if(j == 8){
+                            if(cellsToCount[i][j - 1].chip?.value == 0){
+                                num += cellsToCount[i][j - 2].chip?.value;
+                            }
+                            else{
+                                num += cellsToCount[i][j - 1].chip?.value;
+                            }
+                        }
+                        else if(j == 0){
+                            if(cellsToCount[i][j + 1].chip?.value == 0){
+                                num += cellsToCount[i][j + 2].chip?.value;
+                            }
+                            else{
+                                num += cellsToCount[i][j + 1].chip?.value;
+                            }
+                        }
+                        else{
+                            if(cellsToCount[i][j - 1].chip?.value == 0){
+                                num += cellsToCount[i][j - 2].chip?.value + 2;
+                            }
+                            else{
+                                num += cellsToCount[i][j - 1].chip?.value + 1;
+                            }
+                        }
+                    }
+                    else{
+                        num += cellsToCount[i][j].chip!.value;
+                    }
+                }
+            }
+        }
+
+        return num;
+    }
+
+    public checkFirstMove(backupBoardCells: Cell[][]): number{
+        return this.countBoardValue(this.cells) - this.countBoardValue(backupBoardCells);
+    }
+
+    public checkBoardValidity(): {checkFlag: boolean, outputErrors: string[]} {
         let errors: number[][] = [];
-        let flag: boolean = true;
+        let checkFlag: boolean = true;
+        let outputErrors: string[] = [];
 
         // [0; 3], [5; 8] — одинаковые числа
         // [10; 22] — возрастание
@@ -40,34 +118,33 @@ export class Board {
             let row = this.cells[i].slice(0, 4);
             if (!(this.checkRow777(row))) {
                 errors.push([i, 1]);
-                flag = false;
+                checkFlag = false;
             }
             row = this.cells[i].slice(5, 9);
             if (!(this.checkRow777(row))) {
                 errors.push([i, 2]);
-                flag = false;
+                checkFlag = false;
             }
 
             row = this.cells[i].slice(10, 23);
             if (!(this.checkRow789(row))) {
                 errors.push([i, 3]);
-                flag = false;
+                checkFlag = false;
             }
         }
 
-        if (!flag) {
-            let errorsList: string[] = [];
+        if (!checkFlag) {
+            
             // let s: string = `Найдены ошибки:\n`;
-            errorsList.push(`Найдены ошибки:\n`);
+            outputErrors.push(`Найдены ошибки:\n`);
             // let s: string = "";
             errors.forEach(row => {
                 let s = `Ошибка в строке ${row[0] + 1} в ${row[1] == 3 ? "секции 1-13" : `${row[1]}й секции 1111`}`;
-                errorsList.push(s);
+                outputErrors.push(s);
             });
-            setError(errorsList);
         }
 
-        return flag;
+        return {checkFlag, outputErrors};
     }
 
     checkRow789(row: Cell[]): boolean {

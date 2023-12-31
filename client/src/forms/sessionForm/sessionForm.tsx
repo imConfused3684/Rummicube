@@ -102,6 +102,16 @@ export default function SessionForm() {
 
     }
 
+    socket.on("someoneTryedToCheck", (hisId, hisErrors)=>{
+      let newErrors: string[] = [`Игрок ${players[hisId][0]} попытался`, "подтвердить правильность хода:", ""]
+
+      hisErrors.forEach((err: any) => {
+        newErrors.push(String(err));
+      });
+
+      setErrors(newErrors);
+    });
+
     socket.on("someoneOut", (hisId)=>{
       navigate(`/main/?username=${uName}&wins=${Number(wins)}&exit=${players[hisId][0]}`);
     });
@@ -234,6 +244,7 @@ export default function SessionForm() {
       setChipSack(newChipSack);
       start();
       setPIfunc();
+      setErrors([]);
     });
 
     socket.on("uCanStart", ()=>{
@@ -329,10 +340,15 @@ export default function SessionForm() {
         selectedCell != cell &&
         selectedCell.chip?.canMove(cell)
       ) {
-        selectedCell.moveChip(cell);
-        setSelectedCell(null);
-        setMoveFlag(false);
-
+        if(firstMoveDone){
+          selectedCell.moveChip(cell);
+          setSelectedCell(null);
+          setMoveFlag(false);
+        }
+        else{
+          setSelectedCell(null);
+          setErrors(["Прежде чем перемещать фишки", "необходимо сделать первый ход"]);
+        }
       } else if (selectedCell == cell) {
         setSelectedCell(null);
       } else {
@@ -394,6 +410,8 @@ export default function SessionForm() {
   }
 
   function funcNo() {
+    setSelectedCell(null);
+
     setErrors([]);
 
     setMoveFlag(true);
@@ -438,41 +456,64 @@ export default function SessionForm() {
   function MoveOrSack({ flag }: FlagProp) {    
 
     function funcOk() {
+      let newErrors: string[] = [];
       if(chipPlaced){
-        if(board.checkBoardValidity(setErrors)){
-          console.log("my finish id" + getMyPlayingID());
-          turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
-          stop();
-
-          permanentChipsInHand = new Set<Chip>;
-          hand.chipsInHand.forEach(chip => {
-            permanentChipsInHand.add(chip);
-          });
-  
-          let newId = 0;
-          if(!(getMyPlayingID() == players.length - 1)){
-            newId = getMyPlayingID() + 1;
-          }
-  
-          setWhosTurn(`Сейчас ходит ${players[newId][0]}`);
-  
-          setMoveFlag(true);
-          setCanMove(false);
-  
-          if(hand.chipsInHand.size == 0){
-            won = true;
-            setWhosTurn(`Вы победили!`);
-            alert("Вы победили!");
+        const {checkFlag, outputErrors} = board.checkBoardValidity();
+        if(checkFlag){
+          if(!firstMoveDone){
+            let desc = board.checkFirstMove(backupBoard.cells);
+            if(desc >= 30){
+              firstMoveDone = true;
+            }
+            else{
+              newErrors = ["Не выполнено правило первого хода!", "Из руки выложенно фишек на:", `${desc} очков`];
+              //setErrors(["Не выполнено правило первого хода!", "Из руки выложенно фишек на:", `${desc} очков`]);
+            }
           }
 
-          players[getMyPlayingID()][1] = hand.chipsInHand.size;
-          setPIfunc();
-          setErrors([]);
-          start();
+          if(firstMoveDone){
+            console.log("my finish id" + getMyPlayingID());
+            turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
+            stop();
+
+            permanentChipsInHand = new Set<Chip>;
+            hand.chipsInHand.forEach(chip => {
+              permanentChipsInHand.add(chip);
+            });
+    
+            let newId = 0;
+            if(!(getMyPlayingID() == players.length - 1)){
+              newId = getMyPlayingID() + 1;
+            }
+    
+            setWhosTurn(`Сейчас ходит ${players[newId][0]}`);
+    
+            setMoveFlag(true);
+            setCanMove(false);
+    
+            if(hand.chipsInHand.size == 0){
+              won = true;
+              setWhosTurn(`Вы победили!`);
+              alert("Вы победили!");
+            }
+
+            players[getMyPlayingID()][1] = hand.chipsInHand.size;
+            setPIfunc();
+            setErrors([]);
+            start();
+          }
+        }
+        else{
+          newErrors = outputErrors;
         }
       }
       else{
-        setErrors(["Для завершения хода нужно", "выложить фишку из руки!"])
+        newErrors = ["Для завершения хода нужно", "выложить фишку из руки!"];
+        //setErrors(["Для завершения хода нужно", "выложить фишку из руки!"]);
+      }
+      setErrors(newErrors);
+      if(newErrors.length > 0){
+        socket.emit("iTryedToCheck", creator.sessionId, getMyPlayingID(), newErrors);
       }
       
     }
