@@ -329,10 +329,15 @@ export default function SessionForm() {
         selectedCell != cell &&
         selectedCell.chip?.canMove(cell)
       ) {
-        selectedCell.moveChip(cell);
-        setSelectedCell(null);
-        setMoveFlag(false);
-
+        if(firstMoveDone){
+          selectedCell.moveChip(cell);
+          setSelectedCell(null);
+          setMoveFlag(false);
+        }
+        else{
+          setSelectedCell(null);
+          setErrors(["Прежде чем перемещать фишки", "необходимо сделать первый ход"]);
+        }
       } else if (selectedCell == cell) {
         setSelectedCell(null);
       } else {
@@ -394,6 +399,8 @@ export default function SessionForm() {
   }
 
   function funcNo() {
+    setSelectedCell(null);
+
     setErrors([]);
 
     setMoveFlag(true);
@@ -440,39 +447,55 @@ export default function SessionForm() {
     function funcOk() {
       if(chipPlaced){
         if(board.checkBoardValidity(setErrors)){
-          console.log("my finish id" + getMyPlayingID());
-          turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
-          stop();
-
-          permanentChipsInHand = new Set<Chip>;
-          hand.chipsInHand.forEach(chip => {
-            permanentChipsInHand.add(chip);
-          });
-  
-          let newId = 0;
-          if(!(getMyPlayingID() == players.length - 1)){
-            newId = getMyPlayingID() + 1;
-          }
-  
-          setWhosTurn(`Сейчас ходит ${players[newId][0]}`);
-  
-          setMoveFlag(true);
-          setCanMove(false);
-  
-          if(hand.chipsInHand.size == 0){
-            won = true;
-            setWhosTurn(`Вы победили!`);
-            alert("Вы победили!");
+          if(!firstMoveDone){
+            let desc = board.checkFirstMove(backupBoard.cells);
+            if(desc >= 30){
+              firstMoveDone = true;
+            }
+            else{
+              setErrors(["Не выполнено правило первого хода!", "Из руки выложенно фишек на:", `${desc} очков`]);
+            }
           }
 
-          players[getMyPlayingID()][1] = hand.chipsInHand.size;
-          setPIfunc();
-          setErrors([]);
-          start();
+          if(firstMoveDone){
+            console.log("my finish id" + getMyPlayingID());
+            turnFinished(creator.sessionId, getMyPlayingID(), hand.chipsInHand.size, board.cells, Array.from(chipSack.chips));
+            stop();
+
+            permanentChipsInHand = new Set<Chip>;
+            hand.chipsInHand.forEach(chip => {
+              permanentChipsInHand.add(chip);
+            });
+    
+            let newId = 0;
+            if(!(getMyPlayingID() == players.length - 1)){
+              newId = getMyPlayingID() + 1;
+            }
+    
+            setWhosTurn(`Сейчас ходит ${players[newId][0]}`);
+    
+            setMoveFlag(true);
+            setCanMove(false);
+    
+            if(hand.chipsInHand.size == 0){
+              won = true;
+              setWhosTurn(`Вы победили!`);
+              alert("Вы победили!");
+            }
+
+            players[getMyPlayingID()][1] = hand.chipsInHand.size;
+            setPIfunc();
+            setErrors([]);
+            start();
+          }
         }
       }
       else{
-        setErrors(["Для завершения хода нужно", "выложить фишку из руки!"])
+        setErrors(["Для завершения хода нужно", "выложить фишку из руки!"]);
+      }
+
+      if(errors.length > 0){
+        socket.emit("iTryedToCheck", creator.sessionId, getMyPlayingID(), errors);
       }
       
     }

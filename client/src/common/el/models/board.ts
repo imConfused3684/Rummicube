@@ -30,6 +30,83 @@ export class Board {
         this.cells[x][y].chip = chip;
     }
 
+    private countBoardValue(cellsToCount: Cell[][]): number{
+        let num: number = 0;
+
+        for(let i = 0; i < 8; i++){
+            for(let j = 0; j < 23; j++){
+                if(cellsToCount[i][j].chip){
+                    if(cellsToCount[i][j].chip!.value == 0){
+                        if(0 < j && j < 8){
+                            if(!cellsToCount[i][j - 1].chip && cellsToCount[i][j + 1].chip?.value == 0){
+                                num += cellsToCount[i][j + 2].chip?.value;
+                            }
+                            else if(!cellsToCount[i][j + 1].chip && cellsToCount[i][j - 1].chip?.value == 0){
+                                num += cellsToCount[i][j - 2].chip?.value;
+                            }
+                            else{
+                                num += Number(cellsToCount[i][j - 1].chip?.value) > Number(cellsToCount[i][j + 1].chip?.value) ? Number(cellsToCount[i][j - 1].chip?.value) : Number(cellsToCount[i][j + 1].chip?.value);
+                            }
+                        }
+                        else if(9 < j && j < 23){
+                            if(!cellsToCount[i][j - 1].chip && cellsToCount[i][j + 1].chip?.value == 0){
+                                num += cellsToCount[i][j + 2].chip?.value - 2;
+                            }
+                            else if(!cellsToCount[i][j + 1].chip && cellsToCount[i][j - 1].chip?.value == 0){
+                                num += cellsToCount[i][j - 2].chip?.value + 2;
+                            }
+                            else if(cellsToCount[i][j - 1].chip?.value == 0){
+                                num += cellsToCount[i][j + 1].chip?.value - 1;
+                            }
+                            else if(cellsToCount[i][j + 1].chip?.value == 0){
+                                num += cellsToCount[i][j - 1].chip?.value + 1;
+                            }
+                            else if(cellsToCount[i][j - 1].chip){
+                                num += cellsToCount[i][j - 1].chip?.value + 1;
+                            }
+                            else{
+                                num += cellsToCount[i][j + 1].chip?.value - 1;
+                            }
+                        }
+                        else if(j == 8){
+                            if(cellsToCount[i][j - 1].chip?.value == 0){
+                                num += cellsToCount[i][j - 2].chip?.value;
+                            }
+                            else{
+                                num += cellsToCount[i][j - 1].chip?.value;
+                            }
+                        }
+                        else if(j == 0){
+                            if(cellsToCount[i][j + 1].chip?.value == 0){
+                                num += cellsToCount[i][j + 2].chip?.value;
+                            }
+                            else{
+                                num += cellsToCount[i][j + 1].chip?.value;
+                            }
+                        }
+                        else{
+                            if(cellsToCount[i][j - 1].chip?.value == 0){
+                                num += cellsToCount[i][j - 2].chip?.value + 2;
+                            }
+                            else{
+                                num += cellsToCount[i][j - 1].chip?.value + 1;
+                            }
+                        }
+                    }
+                    else{
+                        num += cellsToCount[i][j].chip!.value;
+                    }
+                }
+            }
+        }
+
+        return num;
+    }
+
+    public checkFirstMove(backupBoardCells: Cell[][]): number{
+        return this.countBoardValue(this.cells) - this.countBoardValue(backupBoardCells);
+    }
+
     public checkBoardValidity(setError: (s:string[]) => void): boolean {
         let errors: number[][] = [];
         let flag: boolean = true;
