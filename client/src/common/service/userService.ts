@@ -1,4 +1,4 @@
-const server = "http://localhost:6284";
+const server = "http://5.230.229.206:6284";
 
 export async function winsUpdate(uName: string, wins: number) {
     fetch(`${server}/api/user/winsUpdate`, {

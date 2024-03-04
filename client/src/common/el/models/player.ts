@@ -1,6 +1,6 @@
 import  io  from "socket.io-client";
 
-export const socket = io("http://localhost:6284/");
+export const socket = io("http://5.230.229.206:6284/");
 
 export class Player {
     socketId: string;
