@@ -1,4 +1,6 @@
-const server = "http://5.230.229.206:6284";
+import { serverip, serverport } from "../../../config";
+
+const server = `http://${serverip}:${serverport}`;
 
 export async function winsUpdate(uName: string, wins: number) {
     fetch(`${server}/api/user/winsUpdate`, {
